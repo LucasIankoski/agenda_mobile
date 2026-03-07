@@ -72,10 +72,20 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (student.parentEmail != null) ...[
+                  if (student.parentFullName != null || student.parentPrimaryContact != null || student.parentEmail != null) ...[
                     Text('Responsavel', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 6),
-                    Text(student.parentEmail!, style: Theme.of(context).textTheme.bodyLarge),
+                    if (student.parentFullName != null) ...[
+                      Text(student.parentFullName!, style: Theme.of(context).textTheme.bodyLarge),
+                      const SizedBox(height: 6),
+                    ],
+                    if (student.parentPrimaryContact != null) ...[
+                      Text('Contato: ${student.parentPrimaryContact!}', style: Theme.of(context).textTheme.bodyLarge),
+                      const SizedBox(height: 6),
+                    ],
+                    if (student.parentEmail != null && student.parentEmail != student.parentPrimaryContact) ...[
+                      Text('Login: ${student.parentEmail!}', style: Theme.of(context).textTheme.bodyMedium),
+                    ],
                     const SizedBox(height: 16),
                   ],
                   Text('Turma vinculada', style: Theme.of(context).textTheme.titleMedium),

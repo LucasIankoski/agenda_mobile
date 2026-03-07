@@ -15,12 +15,12 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _email = TextEditingController();
+  final _login = TextEditingController();
   final _password = TextEditingController();
 
   @override
   void dispose() {
-    _email.dispose();
+    _login.dispose();
     _password.dispose();
     super.dispose();
   }
@@ -71,13 +71,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                             const SizedBox(height: 18),
                             TextFormField(
-                              controller: _email,
+                              controller: _login,
                               decoration: const InputDecoration(
-                                labelText: 'E-mail',
-                                prefixIcon: Icon(Icons.alternate_email_rounded),
+                                labelText: 'Login (e-mail ou celular)',
+                                prefixIcon: Icon(Icons.person_outline_rounded),
                               ),
-                              keyboardType: TextInputType.emailAddress,
-                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o e-mail' : null,
+                              keyboardType: TextInputType.text,
+                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o login' : null,
                             ),
                             const SizedBox(height: 12),
                             TextFormField(
@@ -99,7 +99,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         if (!_formKey.currentState!.validate()) return;
                                         await ref
                                             .read(authControllerProvider.notifier)
-                                            .login(email: _email.text.trim(), password: _password.text);
+                                            .login(login: _login.text.trim(), password: _password.text);
                                       },
                                 child: auth.isLoading
                                     ? const SizedBox(

@@ -39,11 +39,11 @@ class AuthController extends AsyncNotifier<AuthSession> {
     );
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({required String login, required String password}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(authRepositoryProvider);
-      final auth = await repo.login(LoginRequest(email: email, password: password));
+      final auth = await repo.login(LoginRequest(login: login, password: password));
       _stream.add(null);
       return AuthSession(
         isAuthenticated: true,

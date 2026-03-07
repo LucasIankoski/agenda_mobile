@@ -7,6 +7,9 @@ class Student {
   final DateTime? birthDate;
   final String classroomId;
   final String? parentUserId;
+  final String? parentName;
+  final String? parentLastName;
+  final String? parentContact;
   final String? parentEmail;
 
   Student({
@@ -16,6 +19,9 @@ class Student {
     required this.birthDate,
     required this.classroomId,
     required this.parentUserId,
+    required this.parentName,
+    required this.parentLastName,
+    required this.parentContact,
     required this.parentEmail,
   });
 
@@ -33,11 +39,31 @@ class Student {
       birthDate: bd,
       classroomId: (json['classroomId'] ?? '') as String,
       parentUserId: json['parentUserId'] as String?,
+      parentName: _readString(
+        json,
+        const ['parentName', 'nomeResponsavel', 'responsibleName', 'responsible_name'],
+      ),
+      parentLastName: _readString(
+        json,
+        const ['parentLastName', 'sobrenomeResponsavel', 'responsibleLastName', 'responsible_last_name'],
+      ),
+      parentContact: _readString(
+        json,
+        const ['parentContact', 'contatoResponsavel', 'contato', 'responsibleContact', 'responsible_contact'],
+      ),
       parentEmail: json['parentEmail'] as String?,
     );
   }
 
   String get fullName => '$name $lastName'.trim();
+
+  String? get parentFullName {
+    final full = [parentName, parentLastName].where((part) => part != null && part.trim().isNotEmpty).join(' ');
+    return full.trim().isEmpty ? null : full.trim();
+  }
+
+  String? get parentPrimaryContact => parentContact ?? parentEmail;
+
   String get birthDateLabel {
     if (birthDate == null) return '-';
     return DateFormat('dd/MM/yyyy').format(birthDate!);
@@ -49,14 +75,38 @@ class StudentCreateRequest {
   final String lastName;
   final DateTime? birthDate;
   final String classroomId;
+  final String parentName;
+  final String parentLastName;
+  final String parentContact;
 
-  StudentCreateRequest({required this.name, required this.lastName, required this.birthDate, required this.classroomId});
+  StudentCreateRequest({
+    required this.name,
+    required this.lastName,
+    required this.birthDate,
+    required this.classroomId,
+    required this.parentName,
+    required this.parentLastName,
+    required this.parentContact,
+  });
 
   Map<String, dynamic> toJson() => {
         'name': name,
         'lastName': lastName,
-        // backend usa java.sql.Timestamp; enviar ISO é o mais comum.
+        // backend usa java.sql.Timestamp; enviar ISO e o mais comum.
         'birthDate': birthDate?.toIso8601String(),
         'classroomId': classroomId,
+        'parentName': parentName,
+        'parentLastName': parentLastName,
+        'parentContact': parentContact,
       };
+}
+
+String? _readString(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value is String && value.trim().isNotEmpty) {
+      return value;
+    }
+  }
+  return null;
 }
