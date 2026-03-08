@@ -307,96 +307,29 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _DiarySectionCard(
-                            icon: Icons.opacity_rounded,
-                            title: 'Necessidades',
-                            child: Column(
-                              children: [
-                                _NeedCounterRow(
-                                  label: 'Xixi',
-                                  value: _peeSelected,
-                                  count: _peeCount,
-                                  onChanged: (value) => setState(() {
-                                    _peeSelected = value;
-                                    if (!value) _peeCount = 0;
-                                    if (value && _peeCount == 0) _peeCount = 1;
-                                  }),
-                                  onDecrease: () => setState(() {
-                                    if (_peeCount > 1) _peeCount--;
-                                  }),
-                                  onIncrease: () => setState(() {
-                                    _peeCount++;
-                                    _peeSelected = true;
-                                  }),
-                                ),
-                                const SizedBox(height: 8),
-                                _NeedCounterRow(
-                                  label: 'Coco',
-                                  value: _poopSelected,
-                                  count: _poopCount,
-                                  onChanged: (value) => setState(() {
-                                    _poopSelected = value;
-                                    if (!value) _poopCount = 0;
-                                    if (value && _poopCount == 0) _poopCount = 1;
-                                  }),
-                                  onDecrease: () => setState(() {
-                                    if (_poopCount > 1) _poopCount--;
-                                  }),
-                                  onIncrease: () => setState(() {
-                                    _poopCount++;
-                                    _poopSelected = true;
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _DiarySectionCard(
-                            icon: Icons.check_box_rounded,
-                            title: 'Trazer amanha',
-                            child: Column(
-                              children: [
-                                _SimpleCheckboxRow(
-                                  label: 'Fralda',
-                                  value: _bringDiaper,
-                                  onChanged: (value) => setState(() => _bringDiaper = value),
-                                ),
-                                _SimpleCheckboxRow(
-                                  label: 'Lenco',
-                                  value: _bringWipes,
-                                  onChanged: (value) => setState(() => _bringWipes = value),
-                                ),
-                                _SimpleCheckboxRow(
-                                  label: 'Pomada',
-                                  value: _bringOintment,
-                                  onChanged: (value) => setState(() => _bringOintment = value),
-                                ),
-                                _SimpleCheckboxRow(
-                                  label: 'Pasta de dente',
-                                  value: _bringToothpaste,
-                                  onChanged: (value) => setState(() => _bringToothpaste = value),
-                                ),
-                                const SizedBox(height: 8),
-                                TextField(
-                                  controller: _bringOther,
-                                  minLines: 1,
-                                  maxLines: 2,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Outro',
-                                    hintText: 'Ex.: fantasia, roupa extra...',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final stackCards = constraints.maxWidth < 430;
+
+                        if (stackCards) {
+                          return Column(
+                            children: [
+                              _buildNeedsCard(),
+                              const SizedBox(height: 10),
+                              _buildBringTomorrowCard(),
+                            ],
+                          );
+                        }
+
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildNeedsCard()),
+                            const SizedBox(width: 10),
+                            Expanded(child: _buildBringTomorrowCard()),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     _DiarySectionCard(
@@ -429,6 +362,93 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
           ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+
+  Widget _buildNeedsCard() {
+    return _DiarySectionCard(
+      icon: Icons.opacity_rounded,
+      title: 'Necessidades',
+      child: Column(
+        children: [
+          _NeedCounterRow(
+            label: 'Xixi',
+            value: _peeSelected,
+            count: _peeCount,
+            onChanged: (value) => setState(() {
+              _peeSelected = value;
+              if (!value) _peeCount = 0;
+              if (value && _peeCount == 0) _peeCount = 1;
+            }),
+            onDecrease: () => setState(() {
+              if (_peeCount > 1) _peeCount--;
+            }),
+            onIncrease: () => setState(() {
+              _peeCount++;
+              _peeSelected = true;
+            }),
+          ),
+          const SizedBox(height: 8),
+          _NeedCounterRow(
+            label: 'Coco',
+            value: _poopSelected,
+            count: _poopCount,
+            onChanged: (value) => setState(() {
+              _poopSelected = value;
+              if (!value) _poopCount = 0;
+              if (value && _poopCount == 0) _poopCount = 1;
+            }),
+            onDecrease: () => setState(() {
+              if (_poopCount > 1) _poopCount--;
+            }),
+            onIncrease: () => setState(() {
+              _poopCount++;
+              _poopSelected = true;
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBringTomorrowCard() {
+    return _DiarySectionCard(
+      icon: Icons.check_box_rounded,
+      title: 'Trazer amanha',
+      child: Column(
+        children: [
+          _SimpleCheckboxRow(
+            label: 'Fralda',
+            value: _bringDiaper,
+            onChanged: (value) => setState(() => _bringDiaper = value),
+          ),
+          _SimpleCheckboxRow(
+            label: 'Lenco',
+            value: _bringWipes,
+            onChanged: (value) => setState(() => _bringWipes = value),
+          ),
+          _SimpleCheckboxRow(
+            label: 'Pomada',
+            value: _bringOintment,
+            onChanged: (value) => setState(() => _bringOintment = value),
+          ),
+          _SimpleCheckboxRow(
+            label: 'Pasta de dente',
+            value: _bringToothpaste,
+            onChanged: (value) => setState(() => _bringToothpaste = value),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _bringOther,
+            minLines: 1,
+            maxLines: 2,
+            decoration: const InputDecoration(
+              labelText: 'Outro',
+              hintText: 'Ex.: fantasia, roupa extra...',
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -527,12 +547,16 @@ class _DiarySectionCard extends StatelessWidget {
               children: [
                 Icon(icon, size: 18, color: const Color(0xFF96A3BC)),
                 const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontSize: 17,
-                        color: const Color(0xFF4F5F7B),
-                      ),
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontSize: 17,
+                          color: const Color(0xFF4F5F7B),
+                        ),
+                  ),
                 ),
               ],
             ),
@@ -821,41 +845,63 @@ class _NeedCounterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: InkWell(
-            onTap: () => onChanged(!value),
-            borderRadius: BorderRadius.circular(10),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(
-                children: [
-                  Checkbox(
-                    value: value,
-                    onChanged: (selected) => onChanged(selected ?? false),
-                    visualDensity: VisualDensity.compact,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stackContent = constraints.maxWidth < 210;
+        final labelToggle = InkWell(
+          onTap: () => onChanged(!value),
+          borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: value,
+                  onChanged: (selected) => onChanged(selected ?? false),
+                  visualDensity: VisualDensity.compact,
+                ),
+                const SizedBox(width: 2),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: stackContent ? 2 : 1,
+                    overflow: stackContent ? TextOverflow.visible : TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 2),
-                  Expanded(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ),
-        _CounterBox(
+        );
+
+        final counter = _CounterBox(
           count: count,
           enabled: value,
           onDecrease: onDecrease,
           onIncrease: onIncrease,
-        ),
-      ],
+        );
+
+        if (stackContent) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              labelToggle,
+              const SizedBox(height: 6),
+              Align(
+                alignment: Alignment.centerRight,
+                child: counter,
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            Expanded(child: labelToggle),
+            const SizedBox(width: 8),
+            counter,
+          ],
+        );
+      },
     );
   }
 }
@@ -876,6 +922,7 @@ class _CounterBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: const Color(0xFFE6EAF3),
         borderRadius: BorderRadius.circular(999),
@@ -885,12 +932,16 @@ class _CounterBox extends StatelessWidget {
           IconButton(
             onPressed: enabled ? onDecrease : null,
             icon: const Icon(Icons.remove, size: 16),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
             visualDensity: VisualDensity.compact,
           ),
           Text('$count', style: Theme.of(context).textTheme.titleSmall),
           IconButton(
             onPressed: onIncrease,
             icon: const Icon(Icons.add, size: 16),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
             visualDensity: VisualDensity.compact,
           ),
         ],
