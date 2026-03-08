@@ -22,6 +22,8 @@ class StudentDetailPage extends ConsumerStatefulWidget {
 
 class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
   static const double _actionBottomInset = 96;
+  static const double _actionButtonHeight = 56;
+  static const double _contentBottomSpacing = _actionBottomInset + _actionButtonHeight + 24;
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
     final authSession = ref.watch(authControllerProvider).valueOrNull;
     final isAdmin = authSession?.isAdmin == true;
     final isParent = authSession?.isParent == true;
+    final contentBottomPadding = isParent ? 120.0 : _contentBottomSpacing;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -61,7 +64,7 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
           final diariesAsync = ref.watch(diariesByStudentProvider(widget.studentId));
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, contentBottomPadding),
             children: [
               SectionHeading(
                 eyebrow: 'Perfil',
