@@ -104,7 +104,7 @@ class DiaryRepository {
     } catch (e, st) {
       debugPrint('DiaryRepository.listByStudent unexpected error: $e');
       debugPrint('$st');
-      throw AppException('Falha ao processar a lista de diarios.');
+      throw AppException('Falha ao processar a lista de diários.');
     }
   }
 }

@@ -69,7 +69,7 @@ class ClassroomsPage extends ConsumerWidget {
                 const EmptyStateCard(
                   icon: Icons.class_outlined,
                   title: 'Nenhuma turma cadastrada',
-                  subtitle: 'Crie a primeira turma para comecar a organizar os alunos.',
+                  subtitle: 'Crie a primeira turma para começar a organizar os alunos.',
                 ),
               for (final classroom in items) ...[
                 _ClassroomCard(classroom: classroom),

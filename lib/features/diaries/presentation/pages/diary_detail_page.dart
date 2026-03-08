@@ -20,7 +20,7 @@ class DiaryDetailPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(title: const Text('Diario')),
+      appBar: AppBar(title: const Text('Diário')),
       body: diaryAsync.when(
         data: (diary) => ListView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 140),
@@ -43,7 +43,7 @@ class DiaryDetailPage extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: EmptyStateCard(
               icon: Icons.error_outline_rounded,
-              title: 'Falha ao carregar diario',
+              title: 'Falha ao carregar diário',
               subtitle: _friendlyError(e),
             ),
           ),
@@ -82,7 +82,7 @@ class _DiaryReader extends StatelessWidget {
             children: [
               _DiaryInfoCard(
                 icon: Icons.restaurant_rounded,
-                title: 'Alimentacao',
+                title: 'Alimentação',
                 child: _ReadOnlyMealGrid(meals: payload.meals),
               ),
               const SizedBox(height: 10),
@@ -91,7 +91,7 @@ class _DiaryReader extends StatelessWidget {
                 title: 'Sono',
                 child: Column(
                   children: [
-                    _ReadOnlySleepRow(label: 'Manha', period: payload.sleep.morning),
+                    _ReadOnlySleepRow(label: 'Manhã', period: payload.sleep.morning),
                     const SizedBox(height: 8),
                     _ReadOnlySleepRow(label: 'Tarde', period: payload.sleep.afternoon),
                   ],
@@ -100,15 +100,15 @@ class _DiaryReader extends StatelessWidget {
               const SizedBox(height: 10),
               _DiaryInfoCard(
                 icon: Icons.extension_rounded,
-                title: 'Propostas pedagogicas',
+                title: 'Propostas pedagógicas',
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _ReadOnlyCheck(label: 'Ativ. pedagogica', value: payload.pedagogicalProposals.pedagogicalActivity),
-                    _ReadOnlyCheck(label: 'Musica', value: payload.pedagogicalProposals.music),
-                    _ReadOnlyCheck(label: 'Patio', value: payload.pedagogicalProposals.patio),
-                    _ReadOnlyCheck(label: 'Livre brincar', value: payload.pedagogicalProposals.freePlay),
+                    _ReadOnlyCheck(label: 'Ativ. pedagógica', value: payload.pedagogicalProposals.pedagogicalActivity),
+                    _ReadOnlyCheck(label: 'Música', value: payload.pedagogicalProposals.music),
+                    _ReadOnlyCheck(label: 'Pátio', value: payload.pedagogicalProposals.patio),
+                    _ReadOnlyCheck(label: 'Brincadeira livre', value: payload.pedagogicalProposals.freePlay),
                   ],
                 ),
               ),
@@ -120,14 +120,14 @@ class _DiaryReader extends StatelessWidget {
                   children: [
                     _ReadOnlyNeedRow(label: 'Xixi', need: payload.needs.pee),
                     const SizedBox(height: 8),
-                    _ReadOnlyNeedRow(label: 'Coco', need: payload.needs.poop),
+                    _ReadOnlyNeedRow(label: 'Cocô', need: payload.needs.poop),
                   ],
                 ),
               ),
               const SizedBox(height: 10),
               _DiaryInfoCard(
                 icon: Icons.check_box_rounded,
-                title: 'Trazer amanha',
+                title: 'Trazer amanhã',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -136,7 +136,7 @@ class _DiaryReader extends StatelessWidget {
                       runSpacing: 8,
                       children: [
                         _ReadOnlyCheck(label: 'Fralda', value: payload.bringTomorrow.diaper),
-                        _ReadOnlyCheck(label: 'Lenco', value: payload.bringTomorrow.wipes),
+                        _ReadOnlyCheck(label: 'Lenço', value: payload.bringTomorrow.wipes),
                         _ReadOnlyCheck(label: 'Pomada', value: payload.bringTomorrow.ointment),
                         _ReadOnlyCheck(label: 'Pasta de dente', value: payload.bringTomorrow.toothpaste),
                       ],
@@ -162,7 +162,7 @@ class _DiaryReader extends StatelessWidget {
               const SizedBox(height: 10),
               _DiaryInfoCard(
                 icon: Icons.edit_note_rounded,
-                title: 'Recado da Prof.',
+                title: 'Recado da professora',
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -293,8 +293,8 @@ class _ReadOnlyMealGrid extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        buildRow('Cafe da manha', meals.breakfast),
-        buildRow('Almoco', meals.lunch),
+        buildRow('Café da manhã', meals.breakfast),
+        buildRow('Almoço', meals.lunch),
         buildRow('Mamadeira', meals.bottle),
         buildRow('Fruta', meals.fruit),
         buildRow('Janta', meals.dinner),

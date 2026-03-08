@@ -112,7 +112,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(title: const Text('Diario')),
+      appBar: AppBar(title: const Text('Diário')),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: _actionBottomInset),
@@ -137,7 +137,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                 }
               }
             },
-            child: const Text('Salvar diario'),
+            child: const Text('Salvar diário'),
           ),
         ),
       ),
@@ -149,8 +149,8 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                 padding: EdgeInsets.all(16),
                 child: EmptyStateCard(
                   icon: Icons.menu_book_outlined,
-                  title: 'Nenhum aluno disponivel',
-                  subtitle: 'Cadastre um aluno antes de criar um diario.',
+                  title: 'Nenhum aluno disponível',
+                  subtitle: 'Cadastre um aluno antes de criar um diário.',
                 ),
               ),
             );
@@ -183,7 +183,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                     const SizedBox(height: 10),
                     _DiarySectionCard(
                       icon: Icons.restaurant_rounded,
-                      title: 'Alimentacao',
+                      title: 'Alimentação',
                       child: _MealGrid(
                         breakfast: _breakfast,
                         lunch: _lunch,
@@ -224,7 +224,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                       child: Column(
                         children: [
                           _SleepEditor(
-                            label: 'Manha',
+                            label: 'Manhã',
                             slept: _morningSlept,
                             start: _morningStart,
                             end: _morningEnd,
@@ -278,28 +278,28 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                     const SizedBox(height: 10),
                     _DiarySectionCard(
                       icon: Icons.extension_rounded,
-                      title: 'Propostas pedagogicas',
+                      title: 'Propostas pedagógicas',
                       child: Wrap(
                         spacing: 10,
                         runSpacing: 10,
                         children: [
                           _CheckPill(
-                            label: 'Ativ. pedagogica',
+                            label: 'Ativ. pedagógica',
                             value: _pedagogicalActivity,
                             onChanged: (value) => setState(() => _pedagogicalActivity = value),
                           ),
                           _CheckPill(
-                            label: 'Musica',
+                            label: 'Música',
                             value: _music,
                             onChanged: (value) => setState(() => _music = value),
                           ),
                           _CheckPill(
-                            label: 'Patio',
+                            label: 'Pátio',
                             value: _patio,
                             onChanged: (value) => setState(() => _patio = value),
                           ),
                           _CheckPill(
-                            label: 'Livre brincar',
+                            label: 'Brincadeira livre',
                             value: _freePlay,
                             onChanged: (value) => setState(() => _freePlay = value),
                           ),
@@ -334,13 +334,13 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
                     const SizedBox(height: 10),
                     _DiarySectionCard(
                       icon: Icons.edit_note_rounded,
-                      title: 'Recado da Prof.',
+                      title: 'Recado da professora',
                       child: TextField(
                         controller: _teacherNote,
                         minLines: 3,
                         maxLines: 4,
                         decoration: const InputDecoration(
-                          hintText: 'Escreva um recado para a familia.',
+                          hintText: 'Escreva um recado para a família.',
                           filled: true,
                         ),
                       ),
@@ -391,7 +391,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
           ),
           const SizedBox(height: 8),
           _NeedCounterRow(
-            label: 'Coco',
+            label: 'Cocô',
             value: _poopSelected,
             count: _poopCount,
             onChanged: (value) => setState(() {
@@ -415,7 +415,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
   Widget _buildBringTomorrowCard() {
     return _DiarySectionCard(
       icon: Icons.check_box_rounded,
-      title: 'Trazer amanha',
+      title: 'Trazer amanhã',
       child: Column(
         children: [
           _SimpleCheckboxRow(
@@ -424,7 +424,7 @@ class _DiaryNewPageState extends ConsumerState<DiaryNewPage> {
             onChanged: (value) => setState(() => _bringDiaper = value),
           ),
           _SimpleCheckboxRow(
-            label: 'Lenco',
+            label: 'Lenço',
             value: _bringWipes,
             onChanged: (value) => setState(() => _bringWipes = value),
           ),
@@ -620,8 +620,8 @@ class _MealGrid extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        _MealRow(label: 'Cafe da manha', selected: breakfast, mealKey: _MealKey.breakfast, onChanged: onChanged),
-        _MealRow(label: 'Almoco', selected: lunch, mealKey: _MealKey.lunch, onChanged: onChanged),
+        _MealRow(label: 'Café da manhã', selected: breakfast, mealKey: _MealKey.breakfast, onChanged: onChanged),
+        _MealRow(label: 'Almoço', selected: lunch, mealKey: _MealKey.lunch, onChanged: onChanged),
         _MealRow(label: 'Mamadeira', selected: bottle, mealKey: _MealKey.bottle, onChanged: onChanged),
         _MealRow(label: 'Fruta', selected: fruit, mealKey: _MealKey.fruit, onChanged: onChanged),
         _MealRow(label: 'Janta', selected: dinner, mealKey: _MealKey.dinner, onChanged: onChanged),
@@ -739,7 +739,7 @@ class _SleepEditor extends StatelessWidget {
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Nao dormiu'),
+                  title: const Text('Não dormiu'),
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
               ),
@@ -752,7 +752,7 @@ class _SleepEditor extends StatelessWidget {
               children: [
                 _TimeChip(label: start?.label ?? '--:--', onTap: onPickStart),
                 Text(
-                  'ate',
+                  'até',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 _TimeChip(label: end?.label ?? '--:--', onTap: onPickEnd),

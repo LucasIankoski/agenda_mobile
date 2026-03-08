@@ -115,7 +115,7 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
                               }
                             }
                           },
-                          child: const Text('Salvar alteracoes'),
+                          child: const Text('Salvar alterações'),
                         ),
                         const SizedBox(height: 10),
                         OutlinedButton.icon(
@@ -197,7 +197,7 @@ class _StudentsSection extends StatelessWidget {
       return const EmptyStateCard(
         icon: Icons.people_outline_rounded,
         title: 'Nenhum aluno nesta turma',
-        subtitle: 'Quando houver alunos vinculados, eles aparecerao aqui.',
+        subtitle: 'Quando houver alunos vinculados, eles aparecerão aqui.',
       );
     }
 

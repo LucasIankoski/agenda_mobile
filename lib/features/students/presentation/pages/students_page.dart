@@ -53,8 +53,8 @@ class StudentsPage extends ConsumerWidget {
                 eyebrow: 'Cadastro',
                 title: isParent ? 'Meus alunos' : 'Todos os alunos',
                 subtitle: isParent
-                    ? 'Visualize apenas os alunos vinculados ao seu usuario.'
-                    : 'Acompanhe os registros individuais e crie diarios com mais rapidez.',
+                    ? 'Visualize apenas os alunos vinculados ao seu usuário.'
+                    : 'Acompanhe os registros individuais e crie diários com mais rapidez.',
                 trailing: StatusPill(
                   label: '${items.length} alunos',
                   color: const Color(0xFF14304A),
@@ -73,7 +73,7 @@ class StudentsPage extends ConsumerWidget {
                   icon: Icons.people_outline_rounded,
                   title: isParent ? 'Nenhum aluno vinculado' : 'Nenhum aluno cadastrado',
                   subtitle: isParent
-                      ? 'Quando houver vinculo com seu usuario, os alunos aparecerao aqui.'
+                      ? 'Quando houver vínculo com seu usuário, os alunos aparecerão aqui.'
                       : 'Adicione um aluno e vincule-o a uma turma para continuar.',
                 ),
               for (final student in items) ...[
@@ -146,19 +146,19 @@ class StudentsPage extends ConsumerWidget {
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: parentName,
-                      decoration: const InputDecoration(labelText: 'Nome do responsavel'),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o nome do responsavel' : null,
+                      decoration: const InputDecoration(labelText: 'Nome do responsável'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o nome do responsável' : null,
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: parentLastName,
-                      decoration: const InputDecoration(labelText: 'Sobrenome do responsavel'),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o sobrenome do responsavel' : null,
+                      decoration: const InputDecoration(labelText: 'Sobrenome do responsável'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o sobrenome do responsável' : null,
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: parentContact,
-                      decoration: const InputDecoration(labelText: 'Contato do responsavel (celular BR)'),
+                      decoration: const InputDecoration(labelText: 'Contato do responsável (celular BR)'),
                       keyboardType: TextInputType.phone,
                       validator: _validateParentContact,
                     ),
@@ -285,7 +285,7 @@ class _StudentCard extends StatelessWidget {
 
 String? _validateParentContact(String? value) {
   final raw = value?.trim() ?? '';
-  if (raw.isEmpty) return 'Informe o contato do responsavel';
+  if (raw.isEmpty) return 'Informe o contato do responsável';
 
   final digits = raw.replaceAll(RegExp(r'\D'), '');
   final isValid = RegExp(r'^(55)?[1-9]{2}9\d{8}$').hasMatch(digits);

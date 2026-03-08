@@ -54,8 +54,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     const SurfaceCard(
                       child: SectionHeading(
                         eyebrow: 'Bem-vindo',
-                        title: 'Rotina escolar com visual mais claro e rapido.',
-                        subtitle: 'Entre na sua conta para acompanhar turmas, alunos e diarios.',
+                        title: 'Rotina escolar com visual mais claro e rápido.',
+                        subtitle: 'Entre na sua conta para acompanhar turmas, alunos e diários.',
                       ),
                     ),
                     const SizedBox(height: 18),

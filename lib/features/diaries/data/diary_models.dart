@@ -174,8 +174,8 @@ class DiarySleepPeriod {
       };
 
   String get summary {
-    if (!slept) return 'Nao dormiu';
-    if (startTime != null && endTime != null) return '${startTime!.label} ate ${endTime!.label}';
+    if (!slept) return 'Não dormiu';
+    if (startTime != null && endTime != null) return '${startTime!.label} até ${endTime!.label}';
     return 'Dormiu';
   }
 }
@@ -426,7 +426,7 @@ class Diary {
       parts.add('Sono');
     }
     if (payload.meals.selectedCount > 0) {
-      parts.add('${payload.meals.selectedCount} refeicoes');
+      parts.add('${payload.meals.selectedCount} refeições');
     }
     if (payload.teacherNote != null && payload.teacherNote!.trim().isNotEmpty) {
       parts.add('Recado');

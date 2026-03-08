@@ -30,7 +30,7 @@ class SplashPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Organizando turmas, alunos e diarios em um unico lugar.',
+                    'Organizando turmas, alunos e diários em um único lugar.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),

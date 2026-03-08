@@ -59,7 +59,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       child: SectionHeading(
                         eyebrow: 'Cadastro',
                         title: 'Crie um acesso para administrar a rotina escolar.',
-                        subtitle: 'Selecione o tipo de usuario e conclua o cadastro para entrar no app.',
+                        subtitle: 'Selecione o tipo de usuário e conclua o cadastro para entrar no app.',
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -106,11 +106,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             DropdownButtonFormField<UserType>(
                               value: _type,
                               decoration: const InputDecoration(
-                                labelText: 'Tipo de usuario',
+                                labelText: 'Tipo de usuário',
                                 prefixIcon: Icon(Icons.badge_outlined),
                               ),
                               items: const [
-                                DropdownMenuItem(value: UserType.parent, child: Text('Responsavel')),
+                                DropdownMenuItem(value: UserType.parent, child: Text('Responsável')),
                                 DropdownMenuItem(value: UserType.teacher, child: Text('Professor')),
                                 DropdownMenuItem(value: UserType.admin, child: Text('Admin')),
                               ],
@@ -145,7 +145,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               alignment: Alignment.center,
                               child: TextButton(
                                 onPressed: () => context.go('/auth/login'),
-                                child: const Text('Ja tenho conta'),
+                                child: const Text('Já tenho conta'),
                               ),
                             ),
                           ],

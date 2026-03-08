@@ -45,7 +45,7 @@ class StudentRepository {
       }
       throw _client.mapDioError(e);
     } catch (e) {
-      throw AppException('Falha ao interpretar o aluno vinculado ao responsavel.', cause: e);
+      throw AppException('Falha ao interpretar o aluno vinculado ao responsável.', cause: e);
     }
   }
 
@@ -101,7 +101,7 @@ class StudentRepository {
       }
     }
 
-    throw AppException('Formato de resposta invalido ao carregar alunos.');
+    throw AppException('Formato de resposta inválido ao carregar alunos.');
   }
 
   Student _toStudent(dynamic raw) {
@@ -111,6 +111,6 @@ class StudentRepository {
     if (raw is Map) {
       return Student.fromJson(raw.cast<String, dynamic>());
     }
-    throw AppException('Item de aluno em formato invalido.');
+    throw AppException('Item de aluno em formato inválido.');
   }
 }

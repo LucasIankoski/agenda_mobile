@@ -56,7 +56,7 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
                   ref.invalidate(diariesControllerProvider(widget.studentId));
                 },
                 icon: const Icon(Icons.menu_book_rounded),
-                label: const Text('Novo diario'),
+                label: const Text('Novo diário'),
               ),
             ),
       body: studentAsync.when(
@@ -81,7 +81,7 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (student.parentFullName != null || student.parentPrimaryContact != null || student.parentEmail != null) ...[
-                      Text('Responsavel', style: Theme.of(context).textTheme.titleMedium),
+                      Text('Responsável', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 6),
                       if (student.parentFullName != null) ...[
                         Text(student.parentFullName!, style: Theme.of(context).textTheme.bodyLarge),
@@ -139,17 +139,17 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Diarios', style: Theme.of(context).textTheme.titleLarge),
+              Text('Diários', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 10),
               diariesAsync.when(
                 data: (page) {
                   if (page.items.isEmpty) {
                     return EmptyStateCard(
                       icon: Icons.menu_book_outlined,
-                      title: 'Nenhum diario cadastrado',
+                      title: 'Nenhum diário cadastrado',
                       subtitle: isParent
-                          ? 'Ainda nao ha diario registrado para este aluno.'
-                          : 'Crie o primeiro diario para registrar a rotina deste aluno.',
+                          ? 'Ainda não há diário registrado para este aluno.'
+                          : 'Crie o primeiro diário para registrar a rotina deste aluno.',
                     );
                   }
 
@@ -208,7 +208,7 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
                               onPressed: page.isLast
                                   ? null
                                   : () => ref.read(diariesControllerProvider(widget.studentId).notifier).load(page.page + 1),
-                              child: const Text('Proxima'),
+                              child: const Text('Próxima'),
                             ),
                           ),
                         ],
@@ -218,7 +218,7 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
                 },
                 error: (e, _) => EmptyStateCard(
                   icon: Icons.error_outline_rounded,
-                  title: 'Falha ao carregar diarios',
+                  title: 'Falha ao carregar diários',
                   subtitle: getFriendlyError(e),
                 ),
                 loading: () => const Padding(
