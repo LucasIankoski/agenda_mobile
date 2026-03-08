@@ -33,12 +33,12 @@ class Student {
     }
 
     return Student(
-      id: (json['id'] ?? '') as String,
-      name: (json['name'] ?? '') as String,
-      lastName: (json['lastName'] ?? '') as String,
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      lastName: json['lastName']?.toString() ?? '',
       birthDate: bd,
-      classroomId: (json['classroomId'] ?? '') as String,
-      parentUserId: json['parentUserId'] as String?,
+      classroomId: json['classroomId']?.toString() ?? '',
+      parentUserId: json['parentUserId']?.toString(),
       parentName: _readString(
         json,
         const ['parentName', 'nomeResponsavel', 'responsibleName', 'responsible_name'],
@@ -51,7 +51,7 @@ class Student {
         json,
         const ['parentContact', 'contatoResponsavel', 'contato', 'responsibleContact', 'responsible_contact'],
       ),
-      parentEmail: json['parentEmail'] as String?,
+      parentEmail: json['parentEmail']?.toString(),
     );
   }
 

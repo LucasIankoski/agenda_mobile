@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/ui/brand_widgets.dart';
+import '../auth/presentation/auth_controller.dart';
 
-class HomeShell extends StatelessWidget {
+class HomeShell extends ConsumerWidget {
   final Widget child;
   const HomeShell({super.key, required this.child});
 
-  static const _tabs = <_TabItem>[
+  static const _fullTabs = <_TabItem>[
     _TabItem(label: 'Turmas', route: '/', icon: Icons.class_outlined),
     _TabItem(label: 'Alunos', route: '/students', icon: Icons.people_alt_outlined),
   ];
 
-  int _indexFromLocation(String location) {
+  static const _parentTabs = <_TabItem>[
+    _TabItem(label: 'Alunos', route: '/students', icon: Icons.people_alt_outlined),
+  ];
+
+  int _indexFromLocation(String location, {required bool isParent}) {
+    if (isParent) {
+      return 0;
+    }
+
     if (location == '/' || location.startsWith('/classrooms')) {
       return 0;
     }
@@ -23,27 +33,32 @@ class HomeShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authSession = ref.watch(authControllerProvider).valueOrNull;
+    final isParent = authSession?.isParent == true;
+    final tabs = isParent ? _parentTabs : _fullTabs;
     final location = GoRouterState.of(context).matchedLocation;
-    final currentIndex = _indexFromLocation(location);
+    final currentIndex = _indexFromLocation(location, isParent: isParent);
 
     return Scaffold(
       extendBody: true,
       body: AppBackdrop(child: child),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: NavigationBar(
-            height: 72,
-            selectedIndex: currentIndex,
-            onDestinationSelected: (idx) => context.go(_tabs[idx].route),
-            destinations: [
-              for (final t in _tabs) NavigationDestination(icon: Icon(t.icon), label: t.label),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: isParent
+          ? null
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: NavigationBar(
+                  height: 72,
+                  selectedIndex: currentIndex,
+                  onDestinationSelected: (idx) => context.go(tabs[idx].route),
+                  destinations: [
+                    for (final t in tabs) NavigationDestination(icon: Icon(t.icon), label: t.label),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }

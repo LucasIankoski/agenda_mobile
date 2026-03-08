@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/errors/app_exception.dart';
 import '../../../../core/ui/brand_widgets.dart';
-import '../../../auth/presentation/auth_controller.dart';
 import '../../data/diary_models.dart';
 import '../diaries_controller.dart';
 
@@ -44,7 +44,7 @@ class DiaryDetailPage extends ConsumerWidget {
             child: EmptyStateCard(
               icon: Icons.error_outline_rounded,
               title: 'Falha ao carregar diario',
-              subtitle: getFriendlyError(e),
+              subtitle: _friendlyError(e),
             ),
           ),
         ),
@@ -52,6 +52,11 @@ class DiaryDetailPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _friendlyError(Object e) {
+  if (e is AppException) return e.message;
+  return 'Erro inesperado.';
 }
 
 class _DiaryReader extends StatelessWidget {

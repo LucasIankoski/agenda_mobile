@@ -16,6 +16,9 @@ class StudentsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final students = ref.watch(studentsProvider);
+    final authSession = ref.watch(authControllerProvider).valueOrNull;
+    final isParent = authSession?.isParent == true;
+    final isAdmin = authSession?.isAdmin == true;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -30,14 +33,16 @@ class StudentsPage extends ConsumerWidget {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: _actionBottomInset),
-        child: FloatingActionButton.extended(
-          onPressed: () => _showCreateDialog(context, ref),
-          icon: const Icon(Icons.person_add_alt_1_rounded),
-          label: const Text('Novo aluno'),
-        ),
-      ),
+      floatingActionButton: isAdmin
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: _actionBottomInset),
+              child: FloatingActionButton.extended(
+                onPressed: () => _showCreateDialog(context, ref),
+                icon: const Icon(Icons.person_add_alt_1_rounded),
+                label: const Text('Novo aluno'),
+              ),
+            )
+          : null,
       body: students.when(
         data: (items) => RefreshIndicator(
           onRefresh: () => ref.read(studentsProvider.notifier).refresh(),
@@ -46,8 +51,10 @@ class StudentsPage extends ConsumerWidget {
             children: [
               SectionHeading(
                 eyebrow: 'Cadastro',
-                title: 'Todos os alunos',
-                subtitle: 'Acompanhe os registros individuais e crie diarios com mais rapidez.',
+                title: isParent ? 'Meus alunos' : 'Todos os alunos',
+                subtitle: isParent
+                    ? 'Visualize apenas os alunos vinculados ao seu usuario.'
+                    : 'Acompanhe os registros individuais e crie diarios com mais rapidez.',
                 trailing: StatusPill(
                   label: '${items.length} alunos',
                   color: const Color(0xFF14304A),
@@ -56,19 +63,24 @@ class StudentsPage extends ConsumerWidget {
               const SizedBox(height: 16),
               MetricCard(
                 icon: Icons.people_alt_outlined,
-                label: 'Alunos cadastrados',
+                label: isParent ? 'Alunos vinculados' : 'Alunos cadastrados',
                 value: '${items.length}',
                 tint: const Color(0xFF14304A),
               ),
               const SizedBox(height: 14),
               if (items.isEmpty)
-                const EmptyStateCard(
+                EmptyStateCard(
                   icon: Icons.people_outline_rounded,
-                  title: 'Nenhum aluno cadastrado',
-                  subtitle: 'Adicione um aluno e vincule-o a uma turma para continuar.',
+                  title: isParent ? 'Nenhum aluno vinculado' : 'Nenhum aluno cadastrado',
+                  subtitle: isParent
+                      ? 'Quando houver vinculo com seu usuario, os alunos aparecerao aqui.'
+                      : 'Adicione um aluno e vincule-o a uma turma para continuar.',
                 ),
               for (final student in items) ...[
-                _StudentCard(student: student),
+                _StudentCard(
+                  student: student,
+                  onTap: () => context.push('/students/${student.id}'),
+                ),
                 const SizedBox(height: 12),
               ],
             ],
@@ -227,15 +239,16 @@ class StudentsPage extends ConsumerWidget {
 
 class _StudentCard extends StatelessWidget {
   final Student student;
+  final VoidCallback? onTap;
 
-  const _StudentCard({required this.student});
+  const _StudentCard({required this.student, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return SurfaceCard(
       child: InkWell(
         borderRadius: BorderRadius.circular(28),
-        onTap: () => context.push('/students/${student.id}'),
+        onTap: onTap,
         child: Row(
           children: [
             Container(
@@ -262,7 +275,7 @@ class _StudentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Icon(Icons.chevron_right_rounded),
+            if (onTap != null) const Icon(Icons.chevron_right_rounded),
           ],
         ),
       ),

@@ -16,6 +16,8 @@ class ClassroomsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final classrooms = ref.watch(classroomsProvider);
+    final authSession = ref.watch(authControllerProvider).valueOrNull;
+    final isAdmin = authSession?.isAdmin == true;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -30,14 +32,16 @@ class ClassroomsPage extends ConsumerWidget {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: _actionBottomInset),
-        child: FloatingActionButton.extended(
-          onPressed: () => _showCreateDialog(context, ref),
-          icon: const Icon(Icons.add_rounded),
-          label: const Text('Nova turma'),
-        ),
-      ),
+      floatingActionButton: isAdmin
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: _actionBottomInset),
+              child: FloatingActionButton.extended(
+                onPressed: () => _showCreateDialog(context, ref),
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Nova turma'),
+              ),
+            )
+          : null,
       body: classrooms.when(
         data: (items) => RefreshIndicator(
           onRefresh: () => ref.read(classroomsProvider.notifier).refresh(),

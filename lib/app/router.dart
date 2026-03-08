@@ -23,18 +23,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/splash',
     refreshListenable: GoRouterRefreshStream(ref.watch(authControllerProvider.notifier).stream),
     redirect: (context, state) {
-      final isSplash = state.matchedLocation == '/splash';
-      final isAuthRoute = state.matchedLocation.startsWith('/auth');
+      final location = state.matchedLocation;
+      final isSplash = location == '/splash';
+      final isAuthRoute = location.startsWith('/auth');
 
       final authState = ref.read(authControllerProvider);
       final isLoading = authState.isLoading;
-      final isLogged = authState.valueOrNull?.isAuthenticated == true;
+      final authSession = authState.valueOrNull;
+      final isLogged = authSession?.isAuthenticated == true;
+      final isParent = isLogged && authSession?.isParent == true;
 
       if (isSplash) {
         if (isLoading) {
           return null;
         }
-        return isLogged ? '/' : '/auth/login';
+        if (!isLogged) return '/auth/login';
+        return isParent ? '/students' : '/';
       }
 
       if (isLoading) {
@@ -46,7 +50,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLogged && isAuthRoute) {
-        return '/';
+        return isParent ? '/students' : '/';
+      }
+
+      if (isParent) {
+        final canAccessStudentList = location == '/students';
+        final canAccessStudentDetail = location.startsWith('/students/');
+        final canAccessDiaryDetail = location.startsWith('/diaries/') && location != '/diaries/new';
+        final allowedRoute = canAccessStudentList || canAccessStudentDetail || canAccessDiaryDetail;
+        if (!allowedRoute) {
+          return '/students';
+        }
       }
 
       return null;
