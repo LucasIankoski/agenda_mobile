@@ -96,41 +96,44 @@ class ClassroomsPage extends ConsumerWidget {
   Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
     final controller = TextEditingController();
     final formKey = GlobalKey<FormState>();
-
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Nova turma'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            decoration: const InputDecoration(labelText: 'Nome'),
-            validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o nome' : null,
+    try {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Nova turma'),
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: controller,
+              decoration: const InputDecoration(labelText: 'Nome'),
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o nome' : null,
+            ),
           ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancelar')),
+            FilledButton(
+              onPressed: () {
+                if (!formKey.currentState!.validate()) return;
+                Navigator.pop(dialogContext, true);
+              },
+              child: const Text('Criar'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          FilledButton(
-            onPressed: () {
-              if (!formKey.currentState!.validate()) return;
-              Navigator.pop(context, true);
-            },
-            child: const Text('Criar'),
-          ),
-        ],
-      ),
-    );
+      );
 
-    if (ok == true) {
-      try {
-        await ref.read(classroomRepositoryProvider).create(ClassroomCreateRequest(controller.text.trim()));
-        await ref.read(classroomsProvider.notifier).refresh();
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getFriendlyError(e))));
+      if (ok == true) {
+        try {
+          await ref.read(classroomRepositoryProvider).create(ClassroomCreateRequest(controller.text.trim()));
+          await ref.read(classroomsProvider.notifier).refresh();
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getFriendlyError(e))));
+          }
         }
       }
+    } finally {
+      controller.dispose();
     }
   }
 }

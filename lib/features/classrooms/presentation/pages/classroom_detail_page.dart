@@ -122,12 +122,18 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
                           onPressed: () async {
                             final ok = await showDialog<bool>(
                               context: context,
-                              builder: (_) => AlertDialog(
+                              builder: (dialogContext) => AlertDialog(
                                 title: const Text('Excluir turma'),
                                 content: const Text('Tem certeza?'),
                                 actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-                                  FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Excluir')),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(dialogContext, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  FilledButton(
+                                    onPressed: () => Navigator.pop(dialogContext, true),
+                                    child: const Text('Excluir'),
+                                  ),
                                 ],
                               ),
                             );
