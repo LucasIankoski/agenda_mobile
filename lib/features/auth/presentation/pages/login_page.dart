@@ -107,17 +107,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         height: 22,
                                         child: CircularProgressIndicator(strokeWidth: 2.6, color: Colors.white),
                                       )
-                                    : const Text('Acessar painel'),
+                                    : const Text('Entrar'),
                               ),
                             ),
                             const SizedBox(height: 10),
-                            Align(
-                              alignment: Alignment.center,
-                              child: TextButton(
-                                onPressed: () => context.go('/auth/register'),
-                                child: const Text('Criar conta'),
-                              ),
-                            ),
                           ],
                         ),
                       ),

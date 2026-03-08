@@ -25,7 +25,7 @@ class SplashPage extends ConsumerWidget {
                   const AppLogo(size: 72),
                   const SizedBox(height: 20),
                   Text(
-                    'Agenda Infantil',
+                    'Agenda Online',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),

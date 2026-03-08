@@ -12,7 +12,7 @@ class AgendaApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'Agenda Infantil',
+      title: 'Agenda Online',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       routerConfig: router,

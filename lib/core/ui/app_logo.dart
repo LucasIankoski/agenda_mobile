@@ -102,7 +102,7 @@ class AppLogo extends StatelessWidget {
                   ),
             ),
             Text(
-              'Infantil',
+              'Online',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: const Color(0xFF66748B),
                     fontWeight: FontWeight.w600,
