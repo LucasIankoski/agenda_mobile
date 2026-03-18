@@ -9,10 +9,6 @@ import '../../../students/presentation/students_controller.dart';
 import '../../data/classroom_model.dart';
 import '../classrooms_controller.dart';
 
-final classroomDetailProvider = FutureProvider.family<Classroom, String>((ref, id) async {
-  return ref.read(classroomRepositoryProvider).get(id);
-});
-
 class ClassroomDetailPage extends ConsumerStatefulWidget {
   final String classroomId;
   const ClassroomDetailPage({super.key, required this.classroomId});

@@ -8,6 +8,10 @@ final classroomRepositoryProvider = Provider<ClassroomRepository>((ref) {
   return ClassroomRepository(ref.watch(apiClientProvider));
 });
 
+final classroomDetailProvider = FutureProvider.family<Classroom, String>((ref, id) async {
+  return ref.read(classroomRepositoryProvider).get(id);
+});
+
 final classroomsProvider = AsyncNotifierProvider<ClassroomsController, List<Classroom>>(ClassroomsController.new);
 
 class ClassroomsController extends AsyncNotifier<List<Classroom>> {

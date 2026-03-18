@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/ui/brand_widgets.dart';
 import '../../../auth/presentation/auth_controller.dart';
+import '../../../classrooms/presentation/classrooms_controller.dart';
 import '../../../diaries/presentation/diaries_controller.dart';
 import '../../data/student_model.dart';
 import '../students_controller.dart';
@@ -62,6 +63,9 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
       body: studentAsync.when(
         data: (student) {
           final diariesAsync = ref.watch(diariesByStudentProvider(widget.studentId));
+          final classroomId = student.classroomId.trim();
+          final classroomAsync =
+              classroomId.isEmpty ? null : ref.watch(classroomDetailProvider(classroomId));
 
           return ListView(
             padding: EdgeInsets.fromLTRB(16, 8, 16, contentBottomPadding),
@@ -99,7 +103,15 @@ class _StudentDetailPageState extends ConsumerState<StudentDetailPage> {
                     if (!isParent) ...[
                       Text('Turma vinculada', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 6),
-                      Text(student.classroomId, style: Theme.of(context).textTheme.bodyLarge),
+                      Text(
+                        classroomAsync?.when(
+                              data: (classroom) => classroom.name,
+                              loading: () => 'Carregando turma...',
+                              error: (error, stackTrace) => student.classroomId,
+                            ) ??
+                            '-',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ],
                     if (isAdmin) ...[
                       const SizedBox(height: 20),
