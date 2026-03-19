@@ -11,6 +11,8 @@ import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/classrooms/presentation/pages/classrooms_page.dart';
 import '../features/students/presentation/pages/students_page.dart';
 import '../features/students/presentation/pages/student_detail_page.dart';
+import '../features/students/presentation/pages/student_diaries_page.dart';
+import '../features/students/presentation/pages/student_notes_page.dart';
 import '../features/classrooms/presentation/pages/classroom_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_new_page.dart';
@@ -88,6 +90,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/students',
             pageBuilder: (context, state) => const NoTransitionPage(child: StudentsPage()),
+          ),
+          GoRoute(
+            path: '/students/:id/diaries',
+            builder: (context, state) => StudentDiariesPage(studentId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/students/:id/notes',
+            builder: (context, state) => StudentNotesPage(studentId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/students/:id',

@@ -79,6 +79,7 @@ class StudentsPage extends ConsumerWidget {
               for (final student in items) ...[
                 _StudentCard(
                   student: student,
+                  isParent: isParent,
                   onTap: () => context.push('/students/${student.id}'),
                 ),
                 const SizedBox(height: 12),
@@ -239,9 +240,10 @@ class StudentsPage extends ConsumerWidget {
 
 class _StudentCard extends StatelessWidget {
   final Student student;
+  final bool isParent;
   final VoidCallback? onTap;
 
-  const _StudentCard({required this.student, this.onTap});
+  const _StudentCard({required this.student, required this.isParent, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -262,18 +264,25 @@ class _StudentCard extends StatelessWidget {
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(student.fullName, style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Nascimento: ${student.birthDateLabel}',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(student.fullName, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Nascimento: ${student.birthDateLabel}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    if (student.hasPendingParentNotes) ...[
+                      const SizedBox(height: 10),
+                      StatusPill(
+                        label: _pendingNoteLabel(student.pendingParentNoteCount, isParent: isParent),
+                        color: const Color(0xFFD96C06),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-            ),
             const SizedBox(width: 12),
             if (onTap != null) const Icon(Icons.chevron_right_rounded),
           ],
@@ -281,6 +290,13 @@ class _StudentCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _pendingNoteLabel(int count, {required bool isParent}) {
+  if (count == 1) {
+    return isParent ? '1 recado aguardando leitura' : '1 recado novo';
+  }
+  return isParent ? '$count recados aguardando leitura' : '$count recados novos';
 }
 
 String? _validateParentContact(String? value) {

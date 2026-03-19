@@ -11,6 +11,7 @@ class Student {
   final String? parentLastName;
   final String? parentContact;
   final String? parentEmail;
+  final int pendingParentNoteCount;
 
   Student({
     required this.id,
@@ -23,6 +24,7 @@ class Student {
     required this.parentLastName,
     required this.parentContact,
     required this.parentEmail,
+    required this.pendingParentNoteCount,
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,10 @@ class Student {
         const ['parentContact', 'contatoResponsavel', 'contato', 'responsibleContact', 'responsible_contact'],
       ),
       parentEmail: json['parentEmail']?.toString(),
+      pendingParentNoteCount: _readInt(
+        json,
+        const ['pendingParentNoteCount', 'pendingParentNotesCount', 'unreadParentNoteCount'],
+      ),
     );
   }
 
@@ -63,6 +69,8 @@ class Student {
   }
 
   String? get parentPrimaryContact => parentContact ?? parentEmail;
+
+  bool get hasPendingParentNotes => pendingParentNoteCount > 0;
 
   String get birthDateLabel {
     if (birthDate == null) return '-';
@@ -109,4 +117,17 @@ String? _readString(Map<String, dynamic> json, List<String> keys) {
     }
   }
   return null;
+}
+
+int _readInt(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) {
+      final parsed = int.tryParse(value);
+      if (parsed != null) return parsed;
+    }
+  }
+  return 0;
 }

@@ -29,7 +29,7 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncClassroom = ref.watch(classroomDetailProvider(widget.classroomId));
+    final classroomsAsync = ref.watch(classroomsProvider);
     final studentsAsync = ref.watch(studentsByClassroomProvider(widget.classroomId));
     final authSession = ref.watch(authControllerProvider).valueOrNull;
     final isAdmin = authSession?.isAdmin == true;
@@ -37,14 +37,27 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(title: const Text('Turma')),
-      body: asyncClassroom.when(
-        data: (classroom) {
+      body: classroomsAsync.when(
+        data: (items) {
+          final classroom = _findClassroom(items, widget.classroomId);
+          if (classroom == null) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: EmptyStateCard(
+                  icon: Icons.class_outlined,
+                  title: 'Turma não encontrada',
+                  subtitle: 'Não foi possível localizar a turma selecionada.',
+                ),
+              ),
+            );
+          }
+
           _name.text = _name.text.isEmpty ? classroom.name : _name.text;
           _active ??= classroom.active;
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.invalidate(classroomDetailProvider(widget.classroomId));
               ref.invalidate(studentsByClassroomProvider(widget.classroomId));
               await ref.read(classroomsProvider.notifier).refresh();
             },
@@ -98,7 +111,6 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
                                     widget.classroomId,
                                     ClassroomUpdateRequest(name: _name.text.trim(), active: _active ?? true),
                                   );
-                              ref.invalidate(classroomDetailProvider(widget.classroomId));
                               await ref.read(classroomsProvider.notifier).refresh();
                               if (mounted) {
                                 ScaffoldMessenger.of(context)
@@ -188,6 +200,13 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
   }
 }
 
+Classroom? _findClassroom(List<Classroom> classrooms, String id) {
+  for (final classroom in classrooms) {
+    if (classroom.id == id) return classroom;
+  }
+  return null;
+}
+
 class _StudentsSection extends StatelessWidget {
   final List<Student> students;
 
@@ -229,6 +248,13 @@ class _StudentsSection extends StatelessWidget {
                         Text(student.fullName, style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 6),
                         Text('Nascimento: ${student.birthDateLabel}', style: Theme.of(context).textTheme.bodyMedium),
+                        if (student.hasPendingParentNotes) ...[
+                          const SizedBox(height: 10),
+                          StatusPill(
+                            label: _pendingClassroomNoteLabel(student.pendingParentNoteCount),
+                            color: const Color(0xFFD96C06),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -242,4 +268,9 @@ class _StudentsSection extends StatelessWidget {
       ],
     );
   }
+}
+
+String _pendingClassroomNoteLabel(int count) {
+  if (count == 1) return '1 recado novo';
+  return '$count recados novos';
 }
