@@ -149,6 +149,16 @@ class StudentDetailPage extends ConsumerWidget {
                     : null,
                 onTap: () => context.push('/students/$studentId/notes'),
               ),
+              const SizedBox(height: 12),
+              _StudentMenuCard(
+                icon: Icons.photo_library_outlined,
+                title: 'Galeria',
+                subtitle: isParent
+                    ? 'Veja as fotos publicadas pela escola para este aluno.'
+                    : 'Publique fotos deste aluno e mantenha o historico visual atualizado.',
+                accent: const Color(0xFF0E7C86),
+                onTap: () => context.push('/students/$studentId/gallery'),
+              ),
             ],
           );
         },

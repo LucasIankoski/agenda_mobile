@@ -12,6 +12,7 @@ import '../features/classrooms/presentation/pages/classrooms_page.dart';
 import '../features/students/presentation/pages/students_page.dart';
 import '../features/students/presentation/pages/student_detail_page.dart';
 import '../features/students/presentation/pages/student_diaries_page.dart';
+import '../features/students/presentation/pages/student_gallery_page.dart';
 import '../features/students/presentation/pages/student_notes_page.dart';
 import '../features/classrooms/presentation/pages/classroom_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_detail_page.dart';
@@ -98,6 +99,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/students/:id/notes',
             builder: (context, state) => StudentNotesPage(studentId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/students/:id/gallery',
+            builder: (context, state) => StudentGalleryPage(studentId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/students/:id',
