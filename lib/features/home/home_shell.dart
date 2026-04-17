@@ -14,11 +14,17 @@ class HomeShell extends ConsumerWidget {
     _TabItem(label: 'Alunos', route: '/students', icon: Icons.people_alt_outlined),
   ];
 
+  static const _adminTabs = <_TabItem>[
+    _TabItem(label: 'Turmas', route: '/', icon: Icons.class_outlined),
+    _TabItem(label: 'Alunos', route: '/students', icon: Icons.people_alt_outlined),
+    _TabItem(label: 'Usuarios', route: '/users', icon: Icons.manage_accounts_outlined),
+  ];
+
   static const _parentTabs = <_TabItem>[
     _TabItem(label: 'Alunos', route: '/students', icon: Icons.people_alt_outlined),
   ];
 
-  int _indexFromLocation(String location, {required bool isParent}) {
+  int _indexFromLocation(String location, {required bool isParent, required bool isAdmin}) {
     if (isParent) {
       return 0;
     }
@@ -29,6 +35,9 @@ class HomeShell extends ConsumerWidget {
     if (location.startsWith('/students')) {
       return 1;
     }
+    if (isAdmin && location.startsWith('/users')) {
+      return 2;
+    }
     return 0;
   }
 
@@ -36,9 +45,14 @@ class HomeShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authSession = ref.watch(authControllerProvider).valueOrNull;
     final isParent = authSession?.isParent == true;
-    final tabs = isParent ? _parentTabs : _fullTabs;
+    final isAdmin = authSession?.isAdmin == true;
+    final tabs = isParent
+        ? _parentTabs
+        : isAdmin
+            ? _adminTabs
+            : _fullTabs;
     final location = GoRouterState.of(context).matchedLocation;
-    final currentIndex = _indexFromLocation(location, isParent: isParent);
+    final currentIndex = _indexFromLocation(location, isParent: isParent, isAdmin: isAdmin);
 
     return Scaffold(
       extendBody: true,

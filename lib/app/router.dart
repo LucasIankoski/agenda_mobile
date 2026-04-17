@@ -18,6 +18,8 @@ import '../features/classrooms/presentation/pages/classroom_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_new_page.dart';
 import '../features/home/home_shell.dart';
+import '../features/users/presentation/pages/user_detail_page.dart';
+import '../features/users/presentation/pages/users_page.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   ref.watch(authControllerProvider);
@@ -35,6 +37,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final authSession = authState.valueOrNull;
       final isLogged = authSession?.isAuthenticated == true;
       final isParent = isLogged && authSession?.isParent == true;
+      final isAdmin = isLogged && authSession?.isAdmin == true;
 
       if (isSplash) {
         if (isLoading) {
@@ -53,6 +56,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLogged && isAuthRoute) {
+        return isParent ? '/students' : '/';
+      }
+
+      if (!isAdmin && location.startsWith('/users')) {
         return isParent ? '/students' : '/';
       }
 
@@ -93,6 +100,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => const NoTransitionPage(child: StudentsPage()),
           ),
           GoRoute(
+            path: '/users',
+            pageBuilder: (context, state) => const NoTransitionPage(child: UsersPage()),
+          ),
+          GoRoute(
             path: '/students/:id/diaries',
             builder: (context, state) => StudentDiariesPage(studentId: state.pathParameters['id']!),
           ),
@@ -111,6 +122,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/classrooms/:id',
             builder: (context, state) => ClassroomDetailPage(classroomId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/users/:id',
+            builder: (context, state) => UserDetailPage(userId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/diaries/new',

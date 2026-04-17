@@ -91,7 +91,7 @@ class AuthController extends AsyncNotifier<AuthSession> {
     state = await AsyncValue.guard(() async {
       final repo = ref.read(authRepositoryProvider);
       final auth = await repo.register(
-        RegisterRequest(nome: nome, email: email, password: password, type: userTypeToString(type)),
+        RegisterRequest(nome: nome, email: email, password: password, type: userTypeToApiString(type)),
       );
       _stream.add(null);
       return _buildAuthenticatedSession(token: auth.token, authResponse: auth);

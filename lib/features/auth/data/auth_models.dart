@@ -55,7 +55,7 @@ class RegisterRequest {
   final String nome;
   final String email;
   final String password;
-  final String type; // ADMIN | TEACHER | PARENT etc.
+  final String type; // ADMIN | PROFESSOR | PAI etc.
 
   RegisterRequest({required this.nome, required this.email, required this.password, required this.type});
 
@@ -105,10 +105,22 @@ UserType? tryUserTypeFromString(String s) {
 }
 
 String userTypeToString(UserType t) {
+  return userTypeToApiString(t);
+}
+
+String userTypeToApiString(UserType t) {
   return switch (t) {
     UserType.admin => 'ADMIN',
-    UserType.teacher => 'TEACHER',
-    UserType.parent => 'PARENT',
+    UserType.teacher => 'PROFESSOR',
+    UserType.parent => 'PAI',
+  };
+}
+
+String userTypeLabel(UserType t) {
+  return switch (t) {
+    UserType.admin => 'Admin',
+    UserType.teacher => 'Professor',
+    UserType.parent => 'Responsavel',
   };
 }
 
