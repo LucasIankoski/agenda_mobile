@@ -53,16 +53,24 @@ class StudentDiariesPage extends ConsumerWidget {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(16, 8, 16, contentBottomPadding),
                 children: [
-                  SectionHeading(
+                  PageHeroCard(
                     eyebrow: 'Diários',
                     title: student.fullName,
                     subtitle: isParent
-                        ? 'Acompanhe os diários registrados para este aluno.'
-                        : 'Consulte o histórico e crie novos diários para este aluno.',
+                        ? 'Acompanhe os diários registrados para este aluno em uma linha do tempo mais clara.'
+                        : 'Consulte o histórico e registre novos diários com foco em leitura rápida.',
+                    icon: Icons.menu_book_rounded,
+                    accent: const Color(0xFF2E658F),
                     trailing: StatusPill(
                       label: '${page.totalElements} registros',
-                      color: const Color(0xFF7E9DC6),
+                      color: const Color(0xFF2E658F),
                     ),
+                    badges: [
+                      StatusPill(
+                        label: page.items.isEmpty ? 'Sem lançamentos' : 'Histórico disponível',
+                        color: const Color(0xFF26978A),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   if (page.items.isEmpty)
@@ -75,19 +83,21 @@ class StudentDiariesPage extends ConsumerWidget {
                     ),
                   for (final diary in page.items) ...[
                     SurfaceCard(
+                      tint: const Color(0xFFD8E6F4),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(28),
                         onTap: () => context.push('/diaries/${diary.id}'),
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: 50,
-                              height: 50,
+                              width: 56,
+                              height: 56,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFDBE2F2),
-                                borderRadius: BorderRadius.circular(16),
+                                color: const Color(0xFF2E658F).withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Icon(Icons.menu_book_rounded, color: Color(0xFF7E9DC6)),
+                              child: const Icon(Icons.menu_book_rounded, color: Color(0xFF2E658F)),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -100,10 +110,27 @@ class StudentDiariesPage extends ConsumerWidget {
                                     diary.listSummary,
                                     style: Theme.of(context).textTheme.bodyMedium,
                                   ),
+                                  const SizedBox(height: 10),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: const [
+                                      StatusPill(label: 'Abrir detalhes', color: Color(0xFF17324B)),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.chevron_right_rounded),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.82),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(Icons.chevron_right_rounded),
+                            ),
                           ],
                         ),
                       ),

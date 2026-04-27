@@ -25,7 +25,7 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(title: const Text('Usuario')),
+      appBar: AppBar(title: const Text('Usuário')),
       body: userAsync.when(
         data: (user) => RefreshIndicator(
           onRefresh: () async {
@@ -34,14 +34,19 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
             children: [
-              SectionHeading(
+              PageHeroCard(
                 eyebrow: 'Detalhes',
                 title: user.name,
                 subtitle: user.displayEmail,
+                icon: _iconForType(user.type),
+                accent: _accentForUser(user),
                 trailing: StatusPill(
                   label: user.active ? 'Ativo' : 'Inativo',
-                  color: user.active ? const Color(0xFF0E7C86) : const Color(0xFF6C7A90),
+                  color: user.active ? const Color(0xFF26978A) : const Color(0xFF6C7A90),
                 ),
+                badges: [
+                  StatusPill(label: user.roleLabel, color: _accentForUser(user)),
+                ],
               ),
               const SizedBox(height: 16),
               LayoutBuilder(
@@ -55,9 +60,9 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
                   );
                   final statusCard = MetricCard(
                     icon: user.active ? Icons.verified_user_outlined : Icons.block_rounded,
-                    label: 'Situacao',
+                    label: 'Situação',
                     value: user.active ? 'Ativo' : 'Inativo',
-                    tint: user.active ? const Color(0xFF0E7C86) : const Color(0xFF6C7A90),
+                    tint: user.active ? const Color(0xFF26978A) : const Color(0xFF6C7A90),
                   );
 
                   if (stackCards) {
@@ -84,11 +89,12 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Dados da conta',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    SectionHeading(
+                      eyebrow: 'Conta',
+                      title: 'Dados do usuário',
+                      subtitle: 'Informações disponíveis no backend atual para este perfil.',
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 16),
                     _InfoRow(label: 'Nome', value: user.name),
                     const SizedBox(height: 12),
                     _InfoRow(label: 'E-mail', value: user.displayEmail),
@@ -112,18 +118,19 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.block_rounded),
-                    label: Text(_isDisabling ? 'Desativando...' : 'Desativar usuario'),
+                    label: Text(_isDisabling ? 'Desativando...' : 'Desativar usuário'),
                   ),
                 )
               else
                 SurfaceCard(
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Icon(Icons.info_outline_rounded, color: Color(0xFF6C7A90)),
                       const SizedBox(width: 12),
                       Expanded(
                         child: const Text(
-                          'Este usuario ja esta desativado. A reativacao ainda nao e suportada pelo backend atual.',
+                          'Este usuário já está desativado. A reativação ainda não é suportada pelo backend atual.',
                         ),
                       ),
                     ],
@@ -137,7 +144,7 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
             padding: const EdgeInsets.all(16),
             child: EmptyStateCard(
               icon: Icons.error_outline_rounded,
-              title: 'Falha ao carregar usuario',
+              title: 'Falha ao carregar usuário',
               subtitle: getFriendlyError(e),
             ),
           ),
@@ -151,9 +158,9 @@ class _UserDetailPageState extends ConsumerState<UserDetailPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Desativar usuario'),
+        title: const Text('Desativar usuário'),
         content: Text(
-          'Deseja desativar o acesso de ${user.name}? Essa operacao usa o endpoint atual do backend e nao oferece reativacao no app.',
+          'Deseja desativar o acesso de ${user.name}? Essa operação usa o endpoint atual do backend e não oferece reativação no app.',
         ),
         actions: [
           TextButton(
@@ -210,7 +217,7 @@ class _InfoRow extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: const Color(0xFF66748B),
+                color: const Color(0xFF667A91),
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.8,
               ),
@@ -226,9 +233,9 @@ Color _accentForUser(ManagedUser user) {
   if (!user.active) return const Color(0xFF6C7A90);
 
   return switch (user.type) {
-    UserType.admin => const Color(0xFF14304A),
-    UserType.teacher => const Color(0xFF7E9DC6),
-    UserType.parent => const Color(0xFFD96C06),
+    UserType.admin => const Color(0xFF17324B),
+    UserType.teacher => const Color(0xFF2E658F),
+    UserType.parent => const Color(0xFFE99073),
   };
 }
 

@@ -32,25 +32,45 @@ class StudentDetailPage extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
             children: [
-              SectionHeading(
+              PageHeroCard(
                 eyebrow: 'Perfil',
                 title: student.fullName,
                 subtitle: 'Nascimento: ${student.birthDateLabel}',
+                icon: Icons.child_care_outlined,
+                accent: const Color(0xFF17324B),
                 trailing: student.hasPendingParentNotes
                     ? StatusPill(
                         label: _studentSummaryPillLabel(student.pendingParentNoteCount),
-                        color: const Color(0xFFD96C06),
+                        color: const Color(0xFFE99073),
                       )
                     : const StatusPill(
-                        label: 'Aluno',
-                        color: Color(0xFF14304A),
+                        label: 'Aluno ativo',
+                        color: Color(0xFF26978A),
                       ),
+                badges: [
+                  if (student.parentFullName != null)
+                    StatusPill(
+                      label: student.parentFullName!,
+                      color: const Color(0xFF2E658F),
+                    ),
+                  if (!isParent && classroomId.isNotEmpty)
+                    StatusPill(
+                      label: _resolveClassroomName(classroomsAsync, classroomId),
+                      color: const Color(0xFF26978A),
+                    ),
+                ],
               ),
               const SizedBox(height: 16),
               SurfaceCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SectionHeading(
+                      eyebrow: 'Dados',
+                      title: 'Informações principais',
+                      subtitle: 'Resumo do vínculo familiar e da turma associada.',
+                    ),
+                    const SizedBox(height: 16),
                     if (student.parentFullName != null ||
                         student.parentPrimaryContact != null ||
                         student.parentEmail != null) ...[
@@ -124,7 +144,7 @@ class StudentDetailPage extends ConsumerWidget {
               SectionHeading(
                 eyebrow: 'Acessos',
                 title: 'Central do aluno',
-                subtitle: 'Abra diários, recados e novas áreas do perfil por aqui.',
+                subtitle: 'Diários, recados e galeria agora ficam agrupados em uma navegação mais clara.',
               ),
               const SizedBox(height: 12),
               _StudentMenuCard(
@@ -133,7 +153,8 @@ class StudentDetailPage extends ConsumerWidget {
                 subtitle: isParent
                     ? 'Veja o histórico da rotina e acompanhe os registros.'
                     : 'Consulte os registros e crie novos diários para este aluno.',
-                accent: const Color(0xFF7E9DC6),
+                accent: const Color(0xFF2E658F),
+                badgeLabel: 'Histórico do dia',
                 onTap: () => context.push('/students/$studentId/diaries'),
               ),
               const SizedBox(height: 12),
@@ -143,10 +164,10 @@ class StudentDetailPage extends ConsumerWidget {
                 subtitle: isParent
                     ? 'Envie avisos para a escola e acompanhe a leitura.'
                     : 'Veja os recados dos responsáveis e sinalize leitura.',
-                accent: const Color(0xFFD96C06),
+                accent: const Color(0xFFE99073),
                 badgeLabel: student.hasPendingParentNotes
                     ? _studentSummaryPillLabel(student.pendingParentNoteCount)
-                    : null,
+                    : 'Sem pendências',
                 onTap: () => context.push('/students/$studentId/notes'),
               ),
               const SizedBox(height: 12),
@@ -155,8 +176,9 @@ class StudentDetailPage extends ConsumerWidget {
                 title: 'Galeria',
                 subtitle: isParent
                     ? 'Veja as fotos publicadas pela escola para este aluno.'
-                    : 'Publique fotos deste aluno e mantenha o historico visual atualizado.',
-                accent: const Color(0xFF0E7C86),
+                    : 'Publique fotos deste aluno e mantenha o histórico visual atualizado.',
+                accent: const Color(0xFF26978A),
+                badgeLabel: 'Visual do dia',
                 onTap: () => context.push('/students/$studentId/gallery'),
               ),
             ],
@@ -197,55 +219,93 @@ class _StudentMenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SurfaceCard(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(28),
-        onTap: onTap,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: accent.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Icon(icon, color: accent),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 360;
+
+        return SurfaceCard(
+          tint: accent.withValues(alpha: 0.08),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(28),
+            onTap: onTap,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: compact ? 52 : 56,
+                  height: compact ? 52 : 56,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(compact ? 16 : 20),
+                  ),
+                  child: Icon(icon, color: accent, size: compact ? 24 : 26),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          if (compact) ...[
+                            const SizedBox(width: 10),
+                            _MenuChevron(accent: accent),
+                          ],
+                        ],
                       ),
-                      if (badgeLabel != null)
+                      if (badgeLabel != null) ...[
+                        const SizedBox(height: 10),
                         StatusPill(
                           label: badgeLabel!,
                           color: accent,
                         ),
+                      ],
+                      const SizedBox(height: 10),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                ),
+                if (!compact) ...[
+                  const SizedBox(width: 12),
+                  _MenuChevron(accent: accent),
                 ],
-              ),
+              ],
             ),
-            const SizedBox(width: 12),
-            const Padding(
-              padding: EdgeInsets.only(top: 12),
-              child: Icon(Icons.chevron_right_rounded),
-            ),
-          ],
-        ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MenuChevron extends StatelessWidget {
+  final Color accent;
+
+  const _MenuChevron({required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withValues(alpha: 0.12)),
       ),
+      child: const Icon(Icons.chevron_right_rounded),
     );
   }
 }

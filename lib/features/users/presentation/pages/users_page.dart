@@ -33,7 +33,7 @@ class _UsersPageState extends ConsumerState<UsersPage> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Usuarios'),
+        title: const Text('Usuários'),
         actions: [
           IconButton(
             tooltip: 'Sair',
@@ -46,34 +46,65 @@ class _UsersPageState extends ConsumerState<UsersPage> {
         data: (users) {
           final filteredUsers = _filteredUsers(users);
           final activeCount = users.where((user) => user.active).length;
+          final inactiveCount = users.length - activeCount;
 
           return RefreshIndicator(
             onRefresh: () => ref.read(usersProvider.notifier).refresh(),
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
               children: [
-                SectionHeading(
-                  eyebrow: 'Administracao',
-                  title: 'Usuarios do sistema',
-                  subtitle: 'Consulte perfis cadastrados e desative acessos quando necessario.',
+                PageHeroCard(
+                  eyebrow: 'Administração',
+                  title: 'Usuários do sistema',
+                  subtitle: 'Consulte perfis cadastrados, filtre por papel e acompanhe quem está ativo com mais clareza.',
+                  icon: Icons.manage_accounts_outlined,
+                  accent: const Color(0xFF17324B),
                   trailing: StatusPill(
                     label: '${users.length} no total',
-                    color: const Color(0xFF4C6285),
+                    color: const Color(0xFF2E658F),
                   ),
-                ),
-                const SizedBox(height: 16),
-                MetricCard(
-                  icon: Icons.manage_accounts_outlined,
-                  label: 'Usuarios ativos',
-                  value: '$activeCount',
-                  tint: const Color(0xFF0E7C86),
+                  badges: [
+                    StatusPill(label: '$activeCount ativos', color: const Color(0xFF26978A)),
+                    StatusPill(label: '$inactiveCount inativos', color: const Color(0xFFE99073)),
+                  ],
                 ),
                 const SizedBox(height: 14),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(
+                      width: 170,
+                      child: MetricCard(
+                        icon: Icons.how_to_reg_outlined,
+                        label: 'Usuários ativos',
+                        value: '$activeCount',
+                        tint: const Color(0xFF26978A),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 170,
+                      child: MetricCard(
+                        icon: Icons.person_off_outlined,
+                        label: 'Usuários inativos',
+                        value: '$inactiveCount',
+                        tint: const Color(0xFFE99073),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 SurfaceCard(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SectionHeading(
+                        eyebrow: 'Filtros',
+                        title: 'Encontrar um perfil',
+                        subtitle: 'Busque por nome, e-mail ou papel e refine por status.',
+                      ),
+                      const SizedBox(height: 16),
                       TextField(
                         controller: _searchController,
                         decoration: const InputDecoration(
@@ -82,7 +113,7 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                         ),
                         onChanged: (_) => setState(() {}),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       Text(
                         'Perfil',
                         style: Theme.of(context).textTheme.titleSmall,
@@ -105,7 +136,7 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       Text(
                         'Status',
                         style: Theme.of(context).textTheme.titleSmall,
@@ -135,14 +166,24 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 16),
+                SectionHeading(
+                  eyebrow: 'Resultados',
+                  title: 'Perfis encontrados',
+                  subtitle: 'A lista prioriza usuários ativos e ordena alfabeticamente dentro de cada grupo.',
+                  trailing: StatusPill(
+                    label: '${filteredUsers.length} exibidos',
+                    color: const Color(0xFF17324B),
+                  ),
+                ),
                 const SizedBox(height: 14),
                 if (filteredUsers.isEmpty)
                   EmptyStateCard(
                     icon: Icons.manage_accounts_outlined,
-                    title: 'Nenhum usuario encontrado',
+                    title: 'Nenhum usuário encontrado',
                     subtitle: _hasActiveFilters
-                        ? 'Ajuste os filtros para visualizar outros usuarios.'
-                        : 'Quando houver usuarios cadastrados, eles aparecerao aqui.',
+                        ? 'Ajuste os filtros para visualizar outros usuários.'
+                        : 'Quando houver usuários cadastrados, eles aparecerão aqui.',
                   ),
                 for (final user in filteredUsers) ...[
                   _UserCard(
@@ -160,7 +201,7 @@ class _UsersPageState extends ConsumerState<UsersPage> {
             padding: const EdgeInsets.all(16),
             child: EmptyStateCard(
               icon: Icons.error_outline_rounded,
-              title: 'Falha ao carregar usuarios',
+              title: 'Falha ao carregar usuários',
               subtitle: getFriendlyError(e),
             ),
           ),
@@ -206,9 +247,10 @@ class _UserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = _accentForUser(user);
-    final statusColor = user.active ? const Color(0xFF0E7C86) : const Color(0xFF6C7A90);
+    final statusColor = user.active ? const Color(0xFF26978A) : const Color(0xFF6C7A90);
 
     return SurfaceCard(
+      tint: accent.withValues(alpha: 0.08),
       child: InkWell(
         borderRadius: BorderRadius.circular(28),
         onTap: onTap,
@@ -216,11 +258,11 @@ class _UserCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 color: accent.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(_iconForType(user.type), color: accent),
             ),
@@ -234,7 +276,7 @@ class _UserCard extends StatelessWidget {
                   Text(
                     user.displayEmail,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF66748B),
+                          color: const Color(0xFF667A91),
                         ),
                   ),
                   const SizedBox(height: 10),
@@ -250,9 +292,14 @@ class _UserCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Padding(
-              padding: EdgeInsets.only(top: 12),
-              child: Icon(Icons.chevron_right_rounded),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.82),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(Icons.chevron_right_rounded),
             ),
           ],
         ),
@@ -265,9 +312,9 @@ Color _accentForUser(ManagedUser user) {
   if (!user.active) return const Color(0xFF6C7A90);
 
   return switch (user.type) {
-    UserType.admin => const Color(0xFF14304A),
-    UserType.teacher => const Color(0xFF7E9DC6),
-    UserType.parent => const Color(0xFFD96C06),
+    UserType.admin => const Color(0xFF17324B),
+    UserType.teacher => const Color(0xFF2E658F),
+    UserType.parent => const Color(0xFFE99073),
   };
 }
 

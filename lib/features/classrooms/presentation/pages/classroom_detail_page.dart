@@ -64,13 +64,15 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
               children: [
-                SectionHeading(
+                PageHeroCard(
                   eyebrow: 'Turma',
                   title: classroom.name,
-                  subtitle: 'Visualize os alunos vinculados e acompanhe o status da turma.',
+                  subtitle: 'Visualize os alunos vinculados, acompanhe o status atual e faça ajustes administrativos quando necessário.',
+                  icon: Icons.class_outlined,
+                  accent: const Color(0xFF2E658F),
                   trailing: StatusPill(
                     label: classroom.active ? 'Ativa' : 'Inativa',
-                    color: classroom.active ? const Color(0xFF0E7C86) : const Color(0xFFF7A45D),
+                    color: classroom.active ? const Color(0xFF26978A) : const Color(0xFFE99073),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -78,14 +80,19 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SectionHeading(
+                        eyebrow: 'Resumo',
+                        title: 'Dados da turma',
+                        subtitle: 'Os controles abaixo preservam o fluxo atual de edição e exclusão.',
+                      ),
+                      const SizedBox(height: 16),
                       if (isAdmin)
                         TextField(
                           controller: _name,
                           decoration: const InputDecoration(labelText: 'Nome da turma'),
                         ),
-                      if (!isAdmin)
-                        Text('Nome', style: Theme.of(context).textTheme.titleMedium),
                       if (!isAdmin) ...[
+                        Text('Nome', style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 6),
                         Text(classroom.name, style: Theme.of(context).textTheme.bodyLarge),
                       ],
@@ -94,7 +101,6 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
                         SwitchListTile(
                           value: _active ?? true,
                           onChanged: (v) => setState(() => _active = v),
-                          contentPadding: EdgeInsets.zero,
                           title: const Text('Turma ativa'),
                         ),
                       if (!isAdmin) ...[
@@ -166,8 +172,12 @@ class _ClassroomDetailPageState extends ConsumerState<ClassroomDetailPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Alunos da turma', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 10),
+                SectionHeading(
+                  eyebrow: 'Alunos',
+                  title: 'Vinculados à turma',
+                  subtitle: 'Os alunos aparecem abaixo com acesso direto ao respectivo perfil.',
+                ),
+                const SizedBox(height: 12),
                 studentsAsync.when(
                   data: (students) => _StudentsSection(students: students),
                   error: (e, _) => EmptyStateCard(
@@ -226,19 +236,21 @@ class _StudentsSection extends StatelessWidget {
       children: [
         for (final student in students) ...[
           SurfaceCard(
+            tint: const Color(0xFFD8E6F4),
             child: InkWell(
               borderRadius: BorderRadius.circular(28),
               onTap: () => context.push('/students/${student.id}'),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 50,
-                    height: 50,
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF14304A).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFF17324B).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(18),
                     ),
-                    child: const Icon(Icons.child_friendly_outlined, color: Color(0xFF14304A)),
+                    child: const Icon(Icons.child_friendly_outlined, color: Color(0xFF17324B)),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -252,13 +264,21 @@ class _StudentsSection extends StatelessWidget {
                           const SizedBox(height: 10),
                           StatusPill(
                             label: _pendingClassroomNoteLabel(student.pendingParentNoteCount),
-                            color: const Color(0xFFD96C06),
+                            color: const Color(0xFFE99073),
                           ),
                         ],
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right_rounded),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.82),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(Icons.chevron_right_rounded),
+                  ),
                 ],
               ),
             ),
