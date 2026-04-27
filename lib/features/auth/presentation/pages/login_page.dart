@@ -41,84 +41,161 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Scaffold(
       body: AppBackdrop(
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 460),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const AppLogo(size: 78, showWordmark: true),
-                    const SizedBox(height: 28),
-                    const SurfaceCard(
-                      child: SectionHeading(
-                        eyebrow: 'Bem-vindo',
-                        title: 'Rotina escolar com visual mais claro e rápido.',
-                        subtitle: 'Entre na sua conta para acompanhar turmas, alunos e diários.',
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 920;
+              final isCompact = constraints.maxWidth < 640;
+
+              final formCard = SurfaceCard(
+                padding: EdgeInsets.all(isCompact ? 20 : 24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Entrar', style: Theme.of(context).textTheme.headlineSmall),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Use seu e-mail ou celular para continuar.',
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                    ),
-                    const SizedBox(height: 18),
-                    SurfaceCard(
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Entrar',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 18),
-                            TextFormField(
-                              controller: _login,
-                              decoration: const InputDecoration(
-                                labelText: 'Login (e-mail ou celular)',
-                                prefixIcon: Icon(Icons.person_outline_rounded),
-                              ),
-                              keyboardType: TextInputType.text,
-                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o login' : null,
-                            ),
-                            const SizedBox(height: 12),
-                            TextFormField(
-                              controller: _password,
-                              decoration: const InputDecoration(
-                                labelText: 'Senha',
-                                prefixIcon: Icon(Icons.lock_outline_rounded),
-                              ),
-                              obscureText: true,
-                              validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe a senha' : null,
-                            ),
-                            const SizedBox(height: 18),
-                            SizedBox(
-                              width: double.infinity,
-                              child: FilledButton(
-                                onPressed: auth.isLoading
-                                    ? null
-                                    : () async {
-                                        if (!_formKey.currentState!.validate()) return;
-                                        await ref
-                                            .read(authControllerProvider.notifier)
-                                            .login(login: _login.text.trim(), password: _password.text);
-                                      },
-                                child: auth.isLoading
-                                    ? const SizedBox(
-                                        width: 22,
-                                        height: 22,
-                                        child: CircularProgressIndicator(strokeWidth: 2.6, color: Colors.white),
-                                      )
-                                    : const Text('Entrar'),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
+                      const SizedBox(height: 18),
+                      TextFormField(
+                        controller: _login,
+                        decoration: const InputDecoration(
+                          labelText: 'Login',
+                          hintText: 'E-mail ou celular',
+                          prefixIcon: Icon(Icons.person_outline_rounded),
+                        ),
+                        keyboardType: TextInputType.text,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o login' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _password,
+                        decoration: const InputDecoration(
+                          labelText: 'Senha',
+                          prefixIcon: Icon(Icons.lock_outline_rounded),
+                        ),
+                        obscureText: true,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe a senha' : null,
+                      ),
+                      const SizedBox(height: 18),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: auth.isLoading
+                              ? null
+                              : () async {
+                                  if (!_formKey.currentState!.validate()) return;
+                                  await ref
+                                      .read(authControllerProvider.notifier)
+                                      .login(login: _login.text.trim(), password: _password.text);
+                                },
+                          icon: auth.isLoading
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white),
+                                )
+                              : const Icon(Icons.arrow_forward_rounded),
+                          label: Text(auth.isLoading ? 'Entrando...' : 'Entrar'),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      Text(
+                        'Seu perfil define automaticamente o que aparece dentro do app.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () => context.go('/auth/register'),
+                          child: const Text('Criar uma conta'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
+              );
+
+              final compactHeader = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppLogo(size: 62, showWordmark: true),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Entre para acompanhar a rotina escolar.',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Turmas, alunos, diários e recados em uma experiência mais simples e amigável.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              );
+
+              final desktopHero = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppLogo(size: 76, showWordmark: true),
+                  const SizedBox(height: 24),
+                  Text(
+                    'A rotina escolar com menos ruído e mais clareza.',
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(fontSize: 38),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Acompanhe turmas, alunos, diários e recados em uma interface mais direta para quem usa o app todos os dias.',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 18),
+                  const PageHeroCard(
+                    eyebrow: 'Agenda Online',
+                    title: 'Tudo importante em poucos toques.',
+                    subtitle: 'Admins, professores e responsáveis usam o mesmo app, mas cada perfil enxerga apenas o que faz sentido para sua rotina.',
+                    icon: Icons.auto_stories_rounded,
+                    accent: Color(0xFF255A84),
+                    badges: [
+                      StatusPill(label: 'Admin', color: Color(0xFF16324A)),
+                      StatusPill(label: 'Professor', color: Color(0xFF255A84)),
+                      StatusPill(label: 'Responsável', color: Color(0xFF1F7A6E)),
+                    ],
+                  ),
+                ],
+              );
+
+              final content = isWide
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(child: desktopHero),
+                        const SizedBox(width: 28),
+                        SizedBox(width: 420, child: formCard),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        compactHeader,
+                        const SizedBox(height: 18),
+                        formCard,
+                      ],
+                    );
+
+              return Center(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(20, isCompact ? 16 : 20, 20, 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: isWide ? 1040 : 420),
+                    child: content,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

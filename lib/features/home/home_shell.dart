@@ -61,15 +61,30 @@ class HomeShell extends ConsumerWidget {
           ? null
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: NavigationBar(
-                  height: 72,
-                  selectedIndex: currentIndex,
-                  onDestinationSelected: (idx) => context.go(tabs[idx].route),
-                  destinations: [
-                    for (final t in tabs) NavigationDestination(icon: Icon(t.icon), label: t.label),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.55),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF17324B).withValues(alpha: 0.08),
+                      blurRadius: 28,
+                      offset: const Offset(0, 16),
+                    ),
                   ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: NavigationBar(
+                    selectedIndex: currentIndex,
+                    onDestinationSelected: (idx) => context.go(tabs[idx].route),
+                    destinations: [
+                      for (final t in tabs) NavigationDestination(icon: Icon(t.icon), label: t.label),
+                    ],
+                  ),
                 ),
               ),
             ),

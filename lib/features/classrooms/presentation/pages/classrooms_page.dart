@@ -18,6 +18,7 @@ class ClassroomsPage extends ConsumerWidget {
     final classrooms = ref.watch(classroomsProvider);
     final authSession = ref.watch(authControllerProvider).valueOrNull;
     final isAdmin = authSession?.isAdmin == true;
+    final isCompact = MediaQuery.sizeOf(context).width < 480;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -48,23 +49,58 @@ class ClassroomsPage extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
             children: [
-              SectionHeading(
-                eyebrow: 'Painel',
-                title: 'Turmas cadastradas',
-                subtitle: 'Selecione uma turma para visualizar alunos e detalhes.',
+              PageHeroCard(
+                eyebrow: 'Turmas',
+                title: 'Abra uma turma',
+                subtitle: isCompact
+                    ? 'Veja alunos e registros com poucos toques.'
+                    : 'Acesse uma turma para acompanhar alunos, status e registros do dia a dia.',
+                icon: Icons.class_outlined,
+                accent: const Color(0xFF255A84),
                 trailing: StatusPill(
                   label: '${items.length} total',
-                  color: const Color(0xFF0E7C86),
+                  color: const Color(0xFF1F7A6E),
                 ),
+                badges: [
+                  StatusPill(
+                    label: '${items.where((item) => item.active).length} ativas',
+                    color: const Color(0xFF1F7A6E),
+                  ),
+                  if (isAdmin)
+                    const StatusPill(
+                      label: 'Gestão liberada',
+                      color: Color(0xFF16324A),
+                    ),
+                ],
               ),
+              if (!isCompact) ...[
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(
+                      width: 170,
+                      child: MetricCard(
+                        icon: Icons.class_outlined,
+                        label: 'Turmas ativas',
+                        value: '${items.where((item) => item.active).length}',
+                        tint: const Color(0xFF1F7A6E),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 170,
+                      child: MetricCard(
+                        icon: Icons.pause_circle_outline_rounded,
+                        label: 'Turmas inativas',
+                        value: '${items.where((item) => !item.active).length}',
+                        tint: const Color(0xFFBE4A3A),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 16),
-              MetricCard(
-                icon: Icons.class_outlined,
-                label: 'Turmas ativas',
-                value: '${items.where((item) => item.active).length}',
-                tint: const Color(0xFF0E7C86),
-              ),
-              const SizedBox(height: 14),
               if (items.isEmpty)
                 const EmptyStateCard(
                   icon: Icons.class_outlined,
@@ -145,20 +181,22 @@ class _ClassroomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = classroom.active ? const Color(0xFF0E7C86) : const Color(0xFFF7A45D);
+    final accent = classroom.active ? const Color(0xFF1F7A6E) : const Color(0xFFBE4A3A);
 
     return SurfaceCard(
+      borderColor: accent.withValues(alpha: 0.14),
       child: InkWell(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
         onTap: () => context.push('/classrooms/${classroom.id}'),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(18),
+                color: accent.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(Icons.auto_stories_outlined, color: accent),
             ),
@@ -169,6 +207,13 @@ class _ClassroomCard extends StatelessWidget {
                 children: [
                   Text(classroom.name, style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 6),
+                  Text(
+                    classroom.active
+                        ? 'Pronta para acompanhar alunos e registros.'
+                        : 'Disponível para consulta e revisão.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 10),
                   StatusPill(
                     label: classroom.active ? 'Ativa' : 'Inativa',
                     color: accent,
@@ -177,7 +222,15 @@ class _ClassroomCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Icon(Icons.chevron_right_rounded),
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3F6FA),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(Icons.chevron_right_rounded),
+            ),
           ],
         ),
       ),

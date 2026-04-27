@@ -44,49 +44,91 @@ class StudentsPage extends ConsumerWidget {
             )
           : null,
       body: students.when(
-        data: (items) => RefreshIndicator(
-          onRefresh: () => ref.read(studentsProvider.notifier).refresh(),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
-            children: [
-              SectionHeading(
-                eyebrow: 'Cadastro',
-                title: isParent ? 'Meus alunos' : 'Todos os alunos',
-                subtitle: isParent
-                    ? 'Visualize apenas os alunos vinculados ao seu usuário.'
-                    : 'Acompanhe os registros individuais e crie diários com mais rapidez.',
-                trailing: StatusPill(
-                  label: '${items.length} alunos',
-                  color: const Color(0xFF14304A),
-                ),
-              ),
-              const SizedBox(height: 16),
-              MetricCard(
-                icon: Icons.people_alt_outlined,
-                label: isParent ? 'Alunos vinculados' : 'Alunos cadastrados',
-                value: '${items.length}',
-                tint: const Color(0xFF14304A),
-              ),
-              const SizedBox(height: 14),
-              if (items.isEmpty)
-                EmptyStateCard(
-                  icon: Icons.people_outline_rounded,
-                  title: isParent ? 'Nenhum aluno vinculado' : 'Nenhum aluno cadastrado',
+        data: (items) {
+          final totalPendingNotes = items.fold<int>(0, (sum, item) => sum + item.pendingParentNoteCount);
+
+          return RefreshIndicator(
+            onRefresh: () => ref.read(studentsProvider.notifier).refresh(),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
+              children: [
+                PageHeroCard(
+                  eyebrow: 'Cadastro',
+                  title: isParent ? 'Meus alunos' : 'Todos os alunos',
                   subtitle: isParent
-                      ? 'Quando houver vínculo com seu usuário, os alunos aparecerão aqui.'
-                      : 'Adicione um aluno e vincule-o a uma turma para continuar.',
+                      ? 'Visualize apenas os alunos vinculados ao seu usuário e acompanhe diários, recados e galeria.'
+                      : 'Acompanhe os registros individuais e encontre rapidamente quem precisa de atenção.',
+                  icon: Icons.people_alt_outlined,
+                  accent: const Color(0xFF17324B),
+                  trailing: StatusPill(
+                    label: '${items.length} alunos',
+                    color: const Color(0xFF17324B),
+                  ),
+                  badges: [
+                    StatusPill(
+                      label: isParent ? 'Visão do responsável' : 'Visão operacional',
+                      color: const Color(0xFF2E658F),
+                    ),
+                    StatusPill(
+                      label: '$totalPendingNotes recados pendentes',
+                      color: const Color(0xFFE99073),
+                    ),
+                  ],
                 ),
-              for (final student in items) ...[
-                _StudentCard(
-                  student: student,
-                  isParent: isParent,
-                  onTap: () => context.push('/students/${student.id}'),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(
+                      width: 170,
+                      child: MetricCard(
+                        icon: Icons.people_alt_outlined,
+                        label: isParent ? 'Alunos vinculados' : 'Alunos cadastrados',
+                        value: '${items.length}',
+                        tint: const Color(0xFF17324B),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 170,
+                      child: MetricCard(
+                        icon: Icons.markunread_mailbox_outlined,
+                        label: 'Recados pendentes',
+                        value: '$totalPendingNotes',
+                        tint: const Color(0xFFE99073),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                SectionHeading(
+                  eyebrow: 'Lista',
+                  title: isParent ? 'Acompanhamento individual' : 'Abrir perfil do aluno',
+                  subtitle: isParent
+                      ? 'Entre em cada aluno para consultar diários, recados e fotos.'
+                      : 'Entre em cada aluno para ver perfil, diários, recados e galeria.',
+                ),
+                const SizedBox(height: 14),
+                if (items.isEmpty)
+                  EmptyStateCard(
+                    icon: Icons.people_outline_rounded,
+                    title: isParent ? 'Nenhum aluno vinculado' : 'Nenhum aluno cadastrado',
+                    subtitle: isParent
+                        ? 'Quando houver vínculo com seu usuário, os alunos aparecerão aqui.'
+                        : 'Adicione um aluno e vincule-o a uma turma para continuar.',
+                  ),
+                for (final student in items) ...[
+                  _StudentCard(
+                    student: student,
+                    isParent: isParent,
+                    onTap: () => context.push('/students/${student.id}'),
+                  ),
+                  const SizedBox(height: 12),
+                ],
               ],
-            ],
-          ),
-        ),
+            ),
+          );
+        },
         error: (e, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -174,7 +216,6 @@ class StudentsPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     ListTile(
-                      contentPadding: EdgeInsets.zero,
                       title: const Text('Data de nascimento'),
                       subtitle: Text(birthDate == null ? '-' : birthDate!.toIso8601String().split('T').first),
                       trailing: const Icon(Icons.date_range_outlined),
@@ -247,44 +288,76 @@ class _StudentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = student.hasPendingParentNotes ? const Color(0xFFE99073) : const Color(0xFF17324B);
+
     return SurfaceCard(
+      tint: accent.withValues(alpha: 0.08),
       child: InkWell(
         borderRadius: BorderRadius.circular(28),
         onTap: onTap,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: const Color(0xFF14304A).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(18),
+                color: accent.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(Icons.child_care_outlined, color: Color(0xFF14304A)),
+              child: Icon(
+                student.hasPendingParentNotes ? Icons.notifications_active_outlined : Icons.child_care_outlined,
+                color: accent,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(student.fullName, style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(student.fullName, style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Nascimento: ${student.birthDateLabel}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  if (student.parentFullName != null && !isParent) ...[
+                    const SizedBox(height: 4),
                     Text(
-                      'Nascimento: ${student.birthDateLabel}',
+                      'Responsável: ${student.parentFullName!}',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    if (student.hasPendingParentNotes) ...[
-                      const SizedBox(height: 10),
-                      StatusPill(
-                        label: _pendingNoteLabel(student.pendingParentNoteCount, isParent: isParent),
-                        color: const Color(0xFFD96C06),
-                      ),
-                    ],
                   ],
-                ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      StatusPill(
+                        label: isParent ? 'Perfil completo' : 'Abrir aluno',
+                        color: const Color(0xFF2E658F),
+                      ),
+                      if (student.hasPendingParentNotes)
+                        StatusPill(
+                          label: _pendingNoteLabel(student.pendingParentNoteCount, isParent: isParent),
+                          color: const Color(0xFFE99073),
+                        ),
+                    ],
+                  ),
+                ],
               ),
+            ),
             const SizedBox(width: 12),
-            if (onTap != null) const Icon(Icons.chevron_right_rounded),
+            if (onTap != null)
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.82),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(Icons.chevron_right_rounded),
+              ),
           ],
         ),
       ),

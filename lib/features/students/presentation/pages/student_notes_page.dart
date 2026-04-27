@@ -37,20 +37,25 @@ class _StudentNotesPageState extends ConsumerState<StudentNotesPage> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
               children: [
-                SectionHeading(
+                PageHeroCard(
                   eyebrow: 'Recados',
                   title: student.fullName,
                   subtitle: isParent
                       ? 'Envie avisos e acompanhe quando a escola visualizar.'
-                      : 'Veja os recados enviados pelos responsáveis.',
+                      : 'Veja os recados enviados pelos responsáveis e marque a leitura com rapidez.',
+                  icon: Icons.markunread_mailbox_outlined,
+                  accent: const Color(0xFFE99073),
                   trailing: student.hasPendingParentNotes
                       ? StatusPill(
                           label: _studentSummaryPillLabel(student.pendingParentNoteCount),
-                          color: const Color(0xFFD96C06),
+                          color: const Color(0xFFE99073),
                         )
-                      : null,
+                      : const StatusPill(
+                          label: 'Sem pendências',
+                          color: Color(0xFF26978A),
+                        ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 if (isParent) ...[
                   Align(
                     alignment: Alignment.centerLeft,
@@ -211,10 +216,11 @@ class _ParentNoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = note.read ? const Color(0xFF0E7C86) : const Color(0xFFD96C06);
+    final statusColor = note.read ? const Color(0xFF26978A) : const Color(0xFFE99073);
 
     return SurfaceCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
+      tint: statusColor.withValues(alpha: 0.08),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -225,7 +231,7 @@ class _ParentNoteCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: statusColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
@@ -262,7 +268,7 @@ class _ParentNoteCard extends StatelessWidget {
           Text(
             _parentNoteFooterLabel(note, isParent: isParent),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF66748B),
+                  color: const Color(0xFF667A91),
                 ),
           ),
         ],
