@@ -19,6 +19,7 @@ class _UsersPageState extends ConsumerState<UsersPage> {
   final _searchController = TextEditingController();
   UserType? _roleFilter;
   bool? _activeFilter;
+  bool _creatingUser = false;
 
   @override
   void dispose() {
@@ -41,6 +42,21 @@ class _UsersPageState extends ConsumerState<UsersPage> {
             icon: const Icon(Icons.logout_rounded),
           ),
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 96),
+        child: FloatingActionButton.extended(
+          onPressed: _creatingUser ? null : () => _showCreateUserDialog(context),
+          icon: _creatingUser
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.person_add_alt_1_rounded),
+          label: Text(_creatingUser ? 'Criando...' : 'Novo usuario'),
+        ),
       ),
       body: usersAsync.when(
         data: (users) {
@@ -233,6 +249,112 @@ class _UsersPageState extends ConsumerState<UsersPage> {
 
     return filtered;
   }
+
+  Future<void> _showCreateUserDialog(BuildContext context) async {
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    var selectedType = UserType.teacher;
+
+    try {
+      final request = await showDialog<ManagedUserCreateRequest>(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            title: const Text('Novo usuario'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Nome'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o nome' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: 'E-mail ou login'),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Informe o e-mail/login' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(labelText: 'Senha'),
+                      obscureText: true,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return 'Informe a senha';
+                        if (v.trim().length < 5) return 'Use ao menos 5 caracteres';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<UserType>(
+                      value: selectedType,
+                      decoration: const InputDecoration(labelText: 'Tipo'),
+                      items: const [
+                        DropdownMenuItem(value: UserType.teacher, child: Text('Professor')),
+                        DropdownMenuItem(value: UserType.admin, child: Text('Admin')),
+                      ],
+                      onChanged: (value) => setDialogState(() => selectedType = value ?? UserType.teacher),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (!formKey.currentState!.validate()) return;
+                  Navigator.pop(
+                    dialogContext,
+                    ManagedUserCreateRequest(
+                      name: nameController.text.trim(),
+                      email: emailController.text.trim(),
+                      password: passwordController.text,
+                      type: selectedType,
+                    ),
+                  );
+                },
+                child: const Text('Criar'),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (request == null || !mounted) return;
+
+      setState(() => _creatingUser = true);
+      try {
+        await ref.read(userRepositoryProvider).create(request);
+        await ref.read(usersProvider.notifier).refresh();
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuario criado com sucesso.')),
+        );
+      } catch (e) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(getFriendlyError(e))));
+      } finally {
+        if (mounted) {
+          setState(() => _creatingUser = false);
+        }
+      }
+    } finally {
+      nameController.dispose();
+      emailController.dispose();
+      passwordController.dispose();
+    }
+  }
 }
 
 class _UserCard extends StatelessWidget {
@@ -312,6 +434,7 @@ Color _accentForUser(ManagedUser user) {
   if (!user.active) return const Color(0xFF6C7A90);
 
   return switch (user.type) {
+    UserType.superAdmin => const Color(0xFF5A3E85),
     UserType.admin => const Color(0xFF17324B),
     UserType.teacher => const Color(0xFF2E658F),
     UserType.parent => const Color(0xFFE99073),
@@ -320,6 +443,7 @@ Color _accentForUser(ManagedUser user) {
 
 IconData _iconForType(UserType type) {
   return switch (type) {
+    UserType.superAdmin => Icons.workspace_premium_outlined,
     UserType.admin => Icons.admin_panel_settings_outlined,
     UserType.teacher => Icons.school_outlined,
     UserType.parent => Icons.family_restroom_outlined,

@@ -12,74 +12,15 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mark = Container(
+    final mark = SizedBox(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size * 0.3),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF2E658F),
-            Color(0xFF26978A),
-            Color(0xFFF1BE7B),
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF2E658F).withValues(alpha: 0.28),
-            blurRadius: 28,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: size * 0.6,
-            height: size * 0.6,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(size * 0.2),
-            ),
-          ),
-          Positioned(
-            top: size * 0.17,
-            right: size * 0.15,
-            child: Container(
-              width: size * 0.15,
-              height: size * 0.15,
-              decoration: const BoxDecoration(
-                color: Color(0xFF17324B),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            left: size * 0.26,
-            child: Container(
-              width: size * 0.04,
-              height: size * 0.3,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2E658F).withValues(alpha: 0.32),
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-          ),
-          Positioned(
-            right: size * 0.26,
-            child: Container(
-              width: size * 0.04,
-              height: size * 0.3,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1BE7B).withValues(alpha: 0.42),
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
-          ),
-        ],
+      child: Image.asset(
+        'assets/brand/logo-agenda.png',
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
       ),
     );
 
@@ -98,7 +39,7 @@ class AppLogo extends StatelessWidget {
               'Agenda',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.8,
+                    letterSpacing: 0,
                   ),
             ),
             Text(
@@ -106,7 +47,7 @@ class AppLogo extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: const Color(0xFF667A91),
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.4,
+                    letterSpacing: 0,
                   ),
             ),
           ],

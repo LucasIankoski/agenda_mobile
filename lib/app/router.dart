@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/presentation/auth_controller.dart';
 import '../features/auth/presentation/pages/login_page.dart';
-import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/classrooms/presentation/pages/classrooms_page.dart';
 import '../features/students/presentation/pages/students_page.dart';
@@ -18,6 +17,7 @@ import '../features/classrooms/presentation/pages/classroom_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_detail_page.dart';
 import '../features/diaries/presentation/pages/diary_new_page.dart';
 import '../features/home/home_shell.dart';
+import '../features/platform/presentation/pages/schools_page.dart';
 import '../features/users/presentation/pages/user_detail_page.dart';
 import '../features/users/presentation/pages/users_page.dart';
 
@@ -38,12 +38,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isLogged = authSession?.isAuthenticated == true;
       final isParent = isLogged && authSession?.isParent == true;
       final isAdmin = isLogged && authSession?.isAdmin == true;
+      final isSuperAdmin = isLogged && authSession?.isSuperAdmin == true;
 
       if (isSplash) {
         if (isLoading) {
           return null;
         }
         if (!isLogged) return '/auth/login';
+        if (isSuperAdmin) return '/platform/schools';
         return isParent ? '/students' : '/';
       }
 
@@ -56,11 +58,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       if (isLogged && isAuthRoute) {
+        if (isSuperAdmin) return '/platform/schools';
         return isParent ? '/students' : '/';
       }
 
       if (!isAdmin && location.startsWith('/users')) {
         return isParent ? '/students' : '/';
+      }
+
+      if (!isSuperAdmin && location.startsWith('/platform')) {
+        return isParent ? '/students' : '/';
+      }
+
+      if (isSuperAdmin && !location.startsWith('/platform')) {
+        return '/platform/schools';
       }
 
       if (isParent) {
@@ -84,10 +95,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/auth/login',
         builder: (context, state) => const LoginPage(),
       ),
-      GoRoute(
-        path: '/auth/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
       ShellRoute(
         builder: (context, state, child) => HomeShell(child: child),
         routes: [
@@ -102,6 +109,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/users',
             pageBuilder: (context, state) => const NoTransitionPage(child: UsersPage()),
+          ),
+          GoRoute(
+            path: '/platform/schools',
+            pageBuilder: (context, state) => const NoTransitionPage(child: SchoolsPage()),
           ),
           GoRoute(
             path: '/students/:id/diaries',

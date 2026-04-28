@@ -42,6 +42,27 @@ class ManagedUser {
   }
 }
 
+class ManagedUserCreateRequest {
+  final String name;
+  final String email;
+  final String password;
+  final UserType type;
+
+  const ManagedUserCreateRequest({
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.type,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'email': email,
+        'password': password,
+        'type': userTypeToApiString(type),
+      };
+}
+
 String? _readString(Map<String, dynamic> json, List<String> keys) {
   for (final key in keys) {
     final value = json[key];
