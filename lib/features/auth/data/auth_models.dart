@@ -5,6 +5,8 @@ class AuthResponse {
   final String? userId;
   final String? userEmail;
   final String? userLogin;
+  final String? schoolId;
+  final String? schoolSlug;
 
   AuthResponse({
     required this.token,
@@ -13,6 +15,8 @@ class AuthResponse {
     this.userId,
     this.userEmail,
     this.userLogin,
+    this.schoolId,
+    this.schoolSlug,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
@@ -38,6 +42,8 @@ class AuthResponse {
                   nestedUser,
                   const ['login', 'username', 'userName', 'user_name', 'preferred_username', 'phone_number', 'phoneNumber'],
                 )),
+      schoolId: _firstString(json, const ['schoolId', 'school_id', 'tenantId', 'tenant_id']),
+      schoolSlug: _firstString(json, const ['schoolSlug', 'school_slug', 'tenantSlug', 'tenant_slug']),
     );
   }
 }
@@ -45,29 +51,35 @@ class AuthResponse {
 class LoginRequest {
   final String login;
   final String password;
+  final String? schoolSlug;
 
-  LoginRequest({required this.login, required this.password});
+  LoginRequest({required this.login, required this.password, this.schoolSlug});
 
-  Map<String, dynamic> toJson() => {'login': login, 'password': password};
+  Map<String, dynamic> toJson() {
+    final data = {'login': login, 'password': password};
+    final normalizedSchoolSlug = schoolSlug?.trim();
+    if (normalizedSchoolSlug != null && normalizedSchoolSlug.isNotEmpty) {
+      data['schoolSlug'] = normalizedSchoolSlug;
+    }
+    return data;
+  }
 }
 
-class RegisterRequest {
-  final String nome;
-  final String email;
-  final String password;
-  final String type; // ADMIN | PROFESSOR | PAI etc.
+class LoginSchoolOption {
+  final String name;
+  final String slug;
 
-  RegisterRequest({required this.nome, required this.email, required this.password, required this.type});
+  const LoginSchoolOption({required this.name, required this.slug});
 
-  Map<String, dynamic> toJson() => {
-        'nome': nome,
-        'email': email,
-        'password': password,
-        'type': type,
-      };
+  factory LoginSchoolOption.fromJson(Map<String, dynamic> json) {
+    return LoginSchoolOption(
+      name: _firstString(json, const ['name', 'nome']) ?? 'Escola sem nome',
+      slug: _firstString(json, const ['slug', 'schoolSlug', 'school_slug']) ?? '',
+    );
+  }
 }
 
-enum UserType { admin, teacher, parent }
+enum UserType { superAdmin, admin, teacher, parent }
 
 UserType userTypeFromString(String s) {
   return tryUserTypeFromString(s) ?? UserType.parent;
@@ -77,6 +89,12 @@ UserType? tryUserTypeFromString(String s) {
   final normalized = _normalizeUserTypeToken(s);
   if (normalized.isEmpty) return null;
 
+  if (normalized == 'SUPER_ADMIN' ||
+      normalized == 'SUPERADMIN' ||
+      normalized.startsWith('SUPER_ADMIN') ||
+      normalized.startsWith('SUPERADMIN')) {
+    return UserType.superAdmin;
+  }
   if (normalized == 'ADMIN' || normalized.startsWith('ADMIN') || normalized.contains('_ADMIN')) {
     return UserType.admin;
   }
@@ -110,6 +128,7 @@ String userTypeToString(UserType t) {
 
 String userTypeToApiString(UserType t) {
   return switch (t) {
+    UserType.superAdmin => 'SUPER_ADMIN',
     UserType.admin => 'ADMIN',
     UserType.teacher => 'PROFESSOR',
     UserType.parent => 'PAI',
@@ -118,6 +137,7 @@ String userTypeToApiString(UserType t) {
 
 String userTypeLabel(UserType t) {
   return switch (t) {
+    UserType.superAdmin => 'Super Admin',
     UserType.admin => 'Admin',
     UserType.teacher => 'Professor',
     UserType.parent => 'Responsavel',

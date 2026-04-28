@@ -20,11 +20,24 @@ class HomeShell extends ConsumerWidget {
     _TabItem(label: 'Usuarios', route: '/users', icon: Icons.manage_accounts_outlined),
   ];
 
+  static const _superAdminTabs = <_TabItem>[
+    _TabItem(label: 'Escolas', route: '/platform/schools', icon: Icons.apartment_rounded),
+  ];
+
   static const _parentTabs = <_TabItem>[
     _TabItem(label: 'Alunos', route: '/students', icon: Icons.people_alt_outlined),
   ];
 
-  int _indexFromLocation(String location, {required bool isParent, required bool isAdmin}) {
+  int _indexFromLocation(
+    String location, {
+    required bool isParent,
+    required bool isAdmin,
+    required bool isSuperAdmin,
+  }) {
+    if (isSuperAdmin) {
+      return 0;
+    }
+
     if (isParent) {
       return 0;
     }
@@ -41,23 +54,37 @@ class HomeShell extends ConsumerWidget {
     return 0;
   }
 
+  List<_TabItem> _tabsFor({
+    required bool isParent,
+    required bool isAdmin,
+    required bool isSuperAdmin,
+  }) {
+    if (isSuperAdmin) return _superAdminTabs;
+    if (isParent) return _parentTabs;
+    if (isAdmin) return _adminTabs;
+    return _fullTabs;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authSession = ref.watch(authControllerProvider).valueOrNull;
     final isParent = authSession?.isParent == true;
     final isAdmin = authSession?.isAdmin == true;
-    final tabs = isParent
-        ? _parentTabs
-        : isAdmin
-            ? _adminTabs
-            : _fullTabs;
+    final isSuperAdmin = authSession?.isSuperAdmin == true;
+    final tabs = _tabsFor(isParent: isParent, isAdmin: isAdmin, isSuperAdmin: isSuperAdmin);
     final location = GoRouterState.of(context).matchedLocation;
-    final currentIndex = _indexFromLocation(location, isParent: isParent, isAdmin: isAdmin);
+    final currentIndex = _indexFromLocation(
+      location,
+      isParent: isParent,
+      isAdmin: isAdmin,
+      isSuperAdmin: isSuperAdmin,
+    );
+    final showBottomNavigation = !isParent && tabs.length >= 2;
 
     return Scaffold(
       extendBody: true,
       body: AppBackdrop(child: child),
-      bottomNavigationBar: isParent
+      bottomNavigationBar: !showBottomNavigation
           ? null
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),

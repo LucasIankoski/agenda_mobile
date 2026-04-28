@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/ui/app_logo.dart';
 import '../../../../core/ui/brand_widgets.dart';
+import '../../data/auth_models.dart';
 import '../auth_controller.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -14,9 +14,12 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  static const _platformSlug = 'platform';
+
   final _formKey = GlobalKey<FormState>();
   final _login = TextEditingController();
   final _password = TextEditingController();
+  String? _selectedSchoolSlug;
 
   @override
   void dispose() {
@@ -28,6 +31,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
+    final schoolsAsync = ref.watch(loginSchoolOptionsProvider);
 
     ref.listen(authControllerProvider, (prev, next) {
       next.whenOrNull(
@@ -61,6 +65,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 18),
+                      _SchoolSelector(
+                        schoolsAsync: schoolsAsync,
+                        selectedSlug: _selectedSchoolSlug,
+                        onChanged: (value) => setState(() => _selectedSchoolSlug = value),
+                        onRetry: () => ref.invalidate(loginSchoolOptionsProvider),
+                      ),
+                      const SizedBox(height: 12),
                       TextFormField(
                         controller: _login,
                         decoration: const InputDecoration(
@@ -89,9 +100,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               ? null
                               : () async {
                                   if (!_formKey.currentState!.validate()) return;
-                                  await ref
-                                      .read(authControllerProvider.notifier)
-                                      .login(login: _login.text.trim(), password: _password.text);
+                                  await ref.read(authControllerProvider.notifier).login(
+                                        schoolSlug: _selectedSchoolSlug,
+                                        login: _login.text.trim(),
+                                        password: _password.text,
+                                      );
                                 },
                           icon: auth.isLoading
                               ? const SizedBox(
@@ -107,14 +120,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       Text(
                         'Seu perfil define automaticamente o que aparece dentro do app.',
                         style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.center,
-                        child: TextButton(
-                          onPressed: () => context.go('/auth/register'),
-                          child: const Text('Criar uma conta'),
-                        ),
                       ),
                     ],
                   ),
@@ -196,6 +201,70 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               );
             },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SchoolSelector extends StatelessWidget {
+  static const _platformSlug = _LoginPageState._platformSlug;
+
+  final AsyncValue<List<LoginSchoolOption>> schoolsAsync;
+  final String? selectedSlug;
+  final ValueChanged<String?> onChanged;
+  final VoidCallback onRetry;
+
+  const _SchoolSelector({
+    required this.schoolsAsync,
+    required this.selectedSlug,
+    required this.onChanged,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return schoolsAsync.when(
+      data: (schools) {
+        final options = [
+          const LoginSchoolOption(name: 'Administração da plataforma', slug: _platformSlug),
+          ...schools,
+        ];
+
+        return DropdownButtonFormField<String>(
+          value: selectedSlug,
+          decoration: const InputDecoration(
+            labelText: 'Escola',
+            prefixIcon: Icon(Icons.apartment_rounded),
+          ),
+          items: [
+            for (final school in options)
+              DropdownMenuItem(
+                value: school.slug,
+                child: Text(school.name),
+              ),
+          ],
+          onChanged: onChanged,
+          validator: (value) => value == null || value.isEmpty ? 'Selecione a escola' : null,
+        );
+      },
+      loading: () => TextFormField(
+        enabled: false,
+        decoration: const InputDecoration(
+          labelText: 'Carregando escolas',
+          prefixIcon: Icon(Icons.apartment_rounded),
+        ),
+      ),
+      error: (error, _) => TextFormField(
+        enabled: false,
+        decoration: InputDecoration(
+          labelText: 'Falha ao carregar escolas',
+          prefixIcon: const Icon(Icons.apartment_rounded),
+          suffixIcon: IconButton(
+            tooltip: 'Tentar novamente',
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded),
           ),
         ),
       ),

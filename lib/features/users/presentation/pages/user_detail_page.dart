@@ -233,6 +233,7 @@ Color _accentForUser(ManagedUser user) {
   if (!user.active) return const Color(0xFF6C7A90);
 
   return switch (user.type) {
+    UserType.superAdmin => const Color(0xFF5A3E85),
     UserType.admin => const Color(0xFF17324B),
     UserType.teacher => const Color(0xFF2E658F),
     UserType.parent => const Color(0xFFE99073),
@@ -241,6 +242,7 @@ Color _accentForUser(ManagedUser user) {
 
 IconData _iconForType(UserType type) {
   return switch (type) {
+    UserType.superAdmin => Icons.workspace_premium_outlined,
     UserType.admin => Icons.admin_panel_settings_outlined,
     UserType.teacher => Icons.school_outlined,
     UserType.parent => Icons.family_restroom_outlined,

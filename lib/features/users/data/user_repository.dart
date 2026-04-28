@@ -31,6 +31,17 @@ class UserRepository {
     }
   }
 
+  Future<ManagedUser> create(ManagedUserCreateRequest request) async {
+    try {
+      final res = await _client.dio.post('/api/v1/users', data: request.toJson());
+      return _toManagedUser(res.data);
+    } on DioException catch (e) {
+      throw _client.mapDioError(e);
+    } catch (e) {
+      throw AppException('Falha ao interpretar o usuario criado.', cause: e);
+    }
+  }
+
   Future<ManagedUser> disable(String id) async {
     try {
       final res = await _client.dio.patch('/api/v1/users/$id/desativar');

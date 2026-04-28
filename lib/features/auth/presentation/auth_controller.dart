@@ -16,6 +16,8 @@ class AuthSession {
   final String? userId;
   final String? userEmail;
   final String? userLogin;
+  final String? schoolId;
+  final String? schoolSlug;
 
   const AuthSession({
     required this.isAuthenticated,
@@ -24,9 +26,12 @@ class AuthSession {
     this.userId,
     this.userEmail,
     this.userLogin,
+    this.schoolId,
+    this.schoolSlug,
   });
 
   bool get isAdmin => userType == UserType.admin;
+  bool get isSuperAdmin => userType == UserType.superAdmin;
   bool get isParent => isAuthenticated && userType == UserType.parent;
 
   String? get responsibleLookupLogin {
@@ -54,6 +59,10 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(ref.watch(apiClientProvider), ref.watch(tokenStorageProvider));
 });
 
+final loginSchoolOptionsProvider = FutureProvider<List<LoginSchoolOption>>((ref) {
+  return ref.watch(authRepositoryProvider).listLoginSchools();
+});
+
 final authControllerProvider = AsyncNotifierProvider<AuthController, AuthSession>(AuthController.new);
 
 class AuthController extends AsyncNotifier<AuthSession> {
@@ -71,30 +80,13 @@ class AuthController extends AsyncNotifier<AuthSession> {
     return _buildAuthenticatedSession(token: token);
   }
 
-  Future<void> login({required String login, required String password}) async {
+  Future<void> login({required String login, required String password, String? schoolSlug}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repo = ref.read(authRepositoryProvider);
-      final auth = await repo.login(LoginRequest(login: login, password: password));
+      final auth = await repo.login(LoginRequest(login: login, password: password, schoolSlug: schoolSlug));
       _stream.add(null);
       return _buildAuthenticatedSession(token: auth.token, authResponse: auth, fallbackLogin: login);
-    });
-  }
-
-  Future<void> register({
-    required String nome,
-    required String email,
-    required String password,
-    required UserType type,
-  }) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final repo = ref.read(authRepositoryProvider);
-      final auth = await repo.register(
-        RegisterRequest(nome: nome, email: email, password: password, type: userTypeToApiString(type)),
-      );
-      _stream.add(null);
-      return _buildAuthenticatedSession(token: auth.token, authResponse: auth);
     });
   }
 
@@ -123,6 +115,8 @@ class AuthController extends AsyncNotifier<AuthSession> {
       userId: authResponse?.userId ?? tokenContext.userId,
       userEmail: (authResponse?.userEmail ?? tokenContext.userEmail)?.toLowerCase(),
       userLogin: mergedLogin?.trim().isEmpty == true ? null : mergedLogin?.trim(),
+      schoolId: authResponse?.schoolId ?? tokenContext.schoolId,
+      schoolSlug: authResponse?.schoolSlug ?? tokenContext.schoolSlug,
     );
   }
 
@@ -158,12 +152,16 @@ class _TokenContext {
   final String? userId;
   final String? userEmail;
   final String? userLogin;
+  final String? schoolId;
+  final String? schoolSlug;
 
   const _TokenContext({
     required this.userType,
     required this.userId,
     required this.userEmail,
     required this.userLogin,
+    required this.schoolId,
+    required this.schoolSlug,
   });
 }
 
@@ -179,6 +177,8 @@ _TokenContext _tokenContextFromToken(String? token) {
     userId: _readUserId(claims),
     userEmail: _readUserEmail(claims, fallbackLogin: userLogin),
     userLogin: userLogin,
+    schoolId: _readStringClaim(claims, const ['schoolId', 'school_id', 'tenantId', 'tenant_id']),
+    schoolSlug: _readStringClaim(claims, const ['schoolSlug', 'school_slug', 'tenantSlug', 'tenant_slug']),
   );
 }
 
